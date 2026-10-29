@@ -7,18 +7,31 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+
 @Service
 public class EmailService {
 
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:support@appzys.com}")
+    @Value("${spring.mail.username:vimalparthiban811@gmail.com}")
     private String senderEmail;
+
+    @Value("${BREVO_API_KEY:}")
+    private String brevoApiKey;
+
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(8))
+            .build();
 
     /**
      * Sends a real HTML OTP email to the user's Gmail/Email address.
-     * With High Priority headers so Android / iOS pushes immediate status bar notification!
+     * Uses Brevo HTTPS API (Port 443 - never blocked on cloud) with SMTP fallback.
      */
     public boolean sendOtpEmail(String recipientEmail, String otp, String userName) {
         String displayName = (userName != null && !userName.isBlank()) ? userName : "Valued Customer";
@@ -52,7 +65,7 @@ public class EmailService {
                 </div>
                 <div class="content">
                   <div class="greeting">Hello %s,</div>
-                  <div class="text">We received a request to reset your password. Use the verification code below to complete your verification:</div>
+                  <div class="text">We received a request to verify your account or reset your password. Use the verification code below:</div>
                   <div class="otp-box">%s</div>
                   <div class="warning">🔒 This OTP is valid for 10 minutes. For your security, never share this code with anyone.</div>
                   <p style="font-size: 11px; color: #94a3b8; margin: 0;">If you did not request this, please ignore this email.</p>
@@ -65,6 +78,16 @@ public class EmailService {
             </html>
             """.formatted(displayName, otp);
 
+        // 1. Try Brevo HTTPS API first (Port 443 - Never Blocked on Cloud!)
+        if (brevoApiKey != null && !brevoApiKey.isBlank()) {
+            boolean brevoSuccess = sendViaBrevoHttps(recipientEmail, displayName, otp, htmlContent);
+            if (brevoSuccess) {
+                return true;
+            }
+            System.out.println("⚠️ [EMAIL FALLBACK] Brevo HTTPS failed, attempting standard SMTP...");
+        }
+
+        // 2. Fallback to JavaMailSender (for Localhost development)
         try {
             if (mailSender == null) {
                 System.out.println("⚠️ [EMAIL SERVICE] JavaMailSender not configured. Email logged to console.");
@@ -74,8 +97,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            // High priority headers for immediate Android / iOS status bar notification
-            helper.setPriority(1); // 1 = Highest
+            helper.setPriority(1);
             message.addHeader("X-Priority", "1");
             message.addHeader("Priority", "Urgent");
             message.addHeader("Importance", "high");
@@ -84,19 +106,68 @@ public class EmailService {
             helper.setFrom(senderEmail, "APPZYS Store Security");
             helper.setTo(recipientEmail);
             helper.setSubject("Your APPZYS Verification Code: " + otp);
-            helper.setText(htmlContent, true); // true = HTML email
+            helper.setText(htmlContent, true);
 
             mailSender.send(message);
 
             System.out.println("==================================================================");
-            System.out.println("✅ [REAL EMAIL DISPATCHED] Real email successfully sent to: " + recipientEmail);
-            System.out.println("📱 [PHONE NOTIFICATION] Google Gmail server will push alert to recipient's phone!");
+            System.out.println("✅ [REAL EMAIL DISPATCHED] Real email successfully sent via SMTP to: " + recipientEmail);
             System.out.println("==================================================================");
             return true;
         } catch (Exception e) {
             System.err.println("❌ [EMAIL DISPATCH ERROR] Could not send email: " + e.getMessage());
-            System.err.println("💡 [HELP] To enable real delivery, make sure Gmail App Password is configured in application.properties.");
+            System.err.println("💡 [HELP] To enable real cloud delivery on Render, set BREVO_API_KEY in Render Environment Variables.");
             return false;
         }
+    }
+
+    private boolean sendViaBrevoHttps(String recipientEmail, String displayName, String otp, String htmlContent) {
+        try {
+            String subject = "Your APPZYS Verification Code: " + otp;
+            String jsonPayload = String.format(
+                "{\"sender\":{\"name\":\"APPZYS Store Security\",\"email\":\"%s\"},\"to\":[{\"email\":\"%s\",\"name\":\"%s\"}],\"subject\":\"%s\",\"htmlContent\":\"%s\"}",
+                escapeJson(senderEmail),
+                escapeJson(recipientEmail),
+                escapeJson(displayName),
+                escapeJson(subject),
+                escapeJson(htmlContent)
+            );
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.brevo.com/v3/smtp/email"))
+                    .timeout(Duration.ofSeconds(8))
+                    .header("api-key", brevoApiKey.trim())
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                System.out.println("==================================================================");
+                System.out.println("✅ [BREVO HTTPS SUCCESS] Real OTP dispatched via Brevo HTTPS API (Port 443) to: " + recipientEmail);
+                System.out.println("📱 [STATUS] Email accepted by Brevo for instant Gmail delivery!");
+                System.out.println("==================================================================");
+                return true;
+            } else {
+                System.err.println("❌ [BREVO API ERROR] Status: " + response.statusCode() + " | Body: " + response.body());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("❌ [BREVO EXCEPTION] " + e.getMessage());
+            return false;
+        }
+    }
+
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }
