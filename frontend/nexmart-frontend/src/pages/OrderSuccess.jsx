@@ -316,10 +316,18 @@ const OrderSuccess = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 bg-white border-t border-slate-200 text-center">
+            <div className="p-3 bg-white border-t border-slate-200 text-center space-y-2">
+              <a
+                href={`https://api.whatsapp.com/send?phone=91${(currentOrder?.phone || '8072784165').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Namaste ${currentOrder?.customerName || 'Customer'}! 🥻\nYour order #${currentOrder ? currentOrder.id : orderId} has been confirmed at APPZYS!\n📦 Items: ${currentOrder?.items?.[0]?.title || 'Saree Living Box 60L'}\n💰 Amount: ₹${currentOrder?.totalAmount || '899'}\n🚚 Courier: ${courierName}\n🏷️ AWB: ${orderAwb}\n🔗 Live Tracking: ${window.location.origin}/track-order?query=${orderAwb}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5c] text-white py-2.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
+              >
+                <span>💬 Open in Official WhatsApp</span>
+              </a>
               <button
                 onClick={() => setShowWhatsappModal(false)}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-xl text-xs font-bold transition cursor-pointer"
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
               >
                 Close WhatsApp Preview
               </button>

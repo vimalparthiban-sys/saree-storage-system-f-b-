@@ -550,10 +550,18 @@ const AdminDashboard = () => {
               )}
             </div>
 
-            <div className="pt-2 border-t border-slate-100 text-center">
+            <div className="pt-2 border-t border-slate-100 text-center space-y-2">
+              <a
+                href={`https://api.whatsapp.com/send?phone=91${(selectedOrderForWhatsapp?.phone || '8072784165').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(selectedOrderForWhatsapp?.whatsappLogs?.[0]?.message || `Hello ${selectedOrderForWhatsapp?.customerName || 'Customer'}! Here is your APPZYS order update.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5c] text-white py-2.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
+              >
+                <MessageCircle className="w-4 h-4" /> Send Real WhatsApp Message to Customer
+              </a>
               <button
                 onClick={() => setSelectedOrderForWhatsapp(null)}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-xl text-xs font-bold transition cursor-pointer"
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
               >
                 Close WhatsApp Log
               </button>

@@ -83,14 +83,24 @@ public class AuthService {
         userRepository.save(user);
 
         System.out.println("=================================================");
-        if (id.contains("@")) {
-            System.out.println("📧 [LIVE EMAIL SERVICE] Dispatching real email to " + id + " -> Verification Code: " + otp);
-            // Real email dispatch via Gmail SMTP -> Triggers real push notification on user's phone!
-            emailService.sendOtpEmail(id, otp, user.getName());
-        } else {
-            System.out.println("📱 [LIVE SMS GATEWAY] Dispatching real SMS to " + id + " -> Verification Code: " + otp);
-            // Real SMS dispatch via Telecom SMS Gateway (Fast2SMS) -> Triggers real SMS notification on user's phone!
-            smsService.sendOtpSms(id, otp);
+        System.out.println("🔔 [MULTI-CHANNEL OTP DISPATCH] Generating OTP: " + otp + " for " + user.getName());
+
+        // 1. Dispatch Email OTP via Brevo HTTPS (Port 443)
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            System.out.println("📧 [BREVO EMAIL] Sending OTP to: " + user.getEmail());
+            emailService.sendOtpEmail(user.getEmail(), otp, user.getName());
+        }
+
+        // 2. Dispatch Cellular SMS OTP via Brevo SMS / Fast2SMS
+        if (user.getPhone() != null && !user.getPhone().isBlank()) {
+            System.out.println("📱 [CELLULAR SMS] Sending OTP to SIM: +91 " + user.getPhone());
+            smsService.sendOtpSms(user.getPhone(), otp);
+        }
+
+        // 3. Log WhatsApp Notification Channel
+        if (user.getPhone() != null && !user.getPhone().isBlank()) {
+            String waLink = "https://wa.me/91" + user.getPhone() + "?text=" + java.net.URLEncoder.encode("Your APPZYS verification code is: " + otp, java.nio.charset.StandardCharsets.UTF_8);
+            System.out.println("💬 [WHATSAPP CHANNEL READY] Direct verification link: " + waLink);
         }
         System.out.println("=================================================");
 
@@ -138,10 +148,11 @@ public class AuthService {
             throw new IllegalArgumentException("OTP has expired. Please request a new code.");
         }
 
-        if (req.getNewPassword() != null && !req.getNewPassword().isBlank()) {
+        if (req.getNewPassword() != null && !req.getNewPassword().trim().isEmpty()) {
             user.setPassword(req.getNewPassword().trim());
         }
 
+        // Clear OTP after successful reset
         user.setOtp(null);
         user.setOtpExpiry(null);
         return userRepository.save(user);
