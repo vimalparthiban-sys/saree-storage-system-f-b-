@@ -12,7 +12,7 @@ import java.time.Duration;
 @Service
 public class SmsService {
 
-    @Value("${TEXTBEE_API_KEY:txb_n8puuT0Z3M0B755Axt8K0e0xd4m9z2Wd}")
+    @Value("${TEXTBEE_API_KEY:txb_O1lnP7GoeOKW9wvnWPJ6bagEHBcCeNBx}")
     private String textbeeApiKey;
 
     @Value("${TEXTBEE_DEVICE_ID:6ae3470ac1ee0a8dece38ed2}")
