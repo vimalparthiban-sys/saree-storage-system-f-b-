@@ -61,9 +61,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const forgotPassword = async (identifier) => {
+  const forgotPassword = async (identifier, channel = null) => {
     try {
-      const res = await api.forgotPassword(identifier);
+      const res = await api.forgotPassword(identifier, channel);
       return res;
     } catch (err) {
       return { success: false, message: err.message || 'Failed to send OTP' };

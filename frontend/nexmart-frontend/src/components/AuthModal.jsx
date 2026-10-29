@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   X, User, Lock, Mail, Phone, ArrowRight, ShieldCheck, 
-  CheckCircle2, AlertCircle, KeyRound, ShieldAlert, Eye, EyeOff, RotateCw 
+  CheckCircle2, AlertCircle, KeyRound, ShieldAlert, Eye, EyeOff, RotateCw, MessageSquare 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -43,6 +43,10 @@ const AuthModal = () => {
     return saved ? parseInt(saved, 10) : 0;
   });
   const [blockTimeRemaining, setBlockTimeRemaining] = useState('');
+
+  // Channel & WhatsApp URL state
+  const [selectedChannel, setSelectedChannel] = useState('EMAIL');
+  const [whatsappUrl, setWhatsappUrl] = useState('');
 
   // Password visibility toggles
   const [showPassword, setShowPassword] = useState(false);
@@ -184,9 +188,8 @@ const AuthModal = () => {
     }
   };
 
-  // Step 1: Send OTP via Backend Email / SMS Service
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
+  // Step 1: Send OTP via Backend Brevo Email / Brevo SMS / WhatsApp Direct Service
+  const handleSendOtp = async (channelOverride = null) => {
     setErrorMsg('');
     setSuccessMsg('');
 
@@ -201,21 +204,33 @@ const AuthModal = () => {
       return;
     }
 
+    const isEmail = id.includes('@');
+    const channel = channelOverride || (isEmail ? 'EMAIL' : 'WHATSAPP');
+    setSelectedChannel(channel);
+
     setLoading(true);
-    const res = await forgotPassword(id);
+    const res = await forgotPassword(id, channel);
     setLoading(false);
 
     if (res.success) {
+      const waLink = res.data?.whatsappUrl || '';
+      setWhatsappUrl(waLink);
+
       setForgotStep('otp');
       setOtpBoxes(['', '', '', '']);
       setResendCountdown(RESEND_TIMEOUT_SECONDS); // Start 2:30 timer
+
+      // If WhatsApp channel was chosen, automatically trigger WhatsApp in new tab or app
+      if (channel === 'WHATSAPP' && waLink) {
+        window.open(waLink, '_blank', 'noopener,noreferrer');
+      }
 
       // Auto-focus first OTP input after transition
       setTimeout(() => {
         otpInputRefs[0].current?.focus();
       }, 150);
     } else {
-      setErrorMsg(res.message || 'Could not find account with this email address');
+      setErrorMsg(res.message || 'Could not find account with this email address or mobile number');
     }
   };
 
@@ -228,12 +243,17 @@ const AuthModal = () => {
     setOtpBoxes(['', '', '', '']);
 
     const id = formData.identifier.trim();
-    const res = await forgotPassword(id);
+    const res = await forgotPassword(id, selectedChannel);
     setLoading(false);
 
     if (res.success) {
-      setSuccessMsg(`New OTP sent to ${id}!`);
+      const waLink = res.data?.whatsappUrl || '';
+      setWhatsappUrl(waLink);
+      setSuccessMsg(`New OTP dispatched via ${selectedChannel === 'WHATSAPP' ? 'WhatsApp' : selectedChannel === 'SMS' ? 'SMS' : 'Email'}!`);
       setResendCountdown(RESEND_TIMEOUT_SECONDS); // Reset 2:30 timer
+      if (selectedChannel === 'WHATSAPP' && waLink) {
+        window.open(waLink, '_blank', 'noopener,noreferrer');
+      }
       setTimeout(() => {
         otpInputRefs[0].current?.focus();
       }, 150);
@@ -577,9 +597,9 @@ const AuthModal = () => {
           {authMode === 'forgot' && (
             <div className="space-y-4 text-xs">
               
-              {/* SUB-STEP 1: Enter Email Only */}
+              {/* SUB-STEP 1: Enter Email or Mobile */}
               {forgotStep === 'identifier' && (
-                <form onSubmit={handleSendOtp} className="space-y-3.5">
+                <div className="space-y-3.5">
                   <div className="p-3 bg-blue-50 text-slate-700 rounded-xl text-xs flex items-center gap-2">
                     <Mail className="w-5 h-5 text-[#1c2d4a] shrink-0" />
                     <span>Enter your registered email address or 10-digit mobile number to receive a 4-digit verification code.</span>
@@ -598,42 +618,106 @@ const AuthModal = () => {
                     />
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* Channel Selection Buttons */}
+                  {formData.identifier.trim().length > 0 && !formData.identifier.includes('@') ? (
+                    // MOBILE ENTERED: User chooses WhatsApp OTP or SMS OTP
+                    <div className="space-y-2 pt-1">
+                      <p className="text-[11px] font-bold text-slate-600 text-center">
+                        Select Where to Receive Your OTP:
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSendOtp('WHATSAPP')}
+                          disabled={loading || isBlocked}
+                          className="py-2.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-98"
+                        >
+                          <MessageSquare className="w-4 h-4 shrink-0" />
+                          <span>{loading && selectedChannel === 'WHATSAPP' ? 'Sending...' : '💬 WhatsApp OTP'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSendOtp('SMS')}
+                          disabled={loading || isBlocked}
+                          className="py-2.5 px-2 rounded-xl bg-[#1c2d4a] hover:bg-[#142239] text-white font-bold text-xs transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-98"
+                        >
+                          <Phone className="w-4 h-4 shrink-0" />
+                          <span>{loading && selectedChannel === 'SMS' ? 'Sending...' : '📱 SIM SMS OTP'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // EMAIL ENTERED OR FIELD EMPTY
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={() => handleSendOtp('EMAIL')}
+                        disabled={loading || isBlocked || !formData.identifier.trim()}
+                        className="w-full py-2.5 rounded-xl bg-[#1c2d4a] text-white font-bold text-xs transition hover:bg-[#142239] cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 active:scale-98"
+                      >
+                        <Mail className="w-4 h-4" />
+                        <span>{loading ? 'Sending OTP to Email...' : '📧 Send OTP to Email'}</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => { setAuthMode('login'); setErrorMsg(''); setSuccessMsg(''); }}
-                      className="flex-1 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                      className="w-full py-2 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer text-xs"
                     >
                       Back to Login
                     </button>
-                    <button
-                      type="submit"
-                      disabled={loading || isBlocked}
-                      className="flex-1 py-2.5 rounded-xl bg-[#1c2d4a] text-white font-bold transition hover:bg-[#142239] cursor-pointer disabled:opacity-50"
-                    >
-                      {loading ? 'Sending...' : 'Send OTP'}
-                    </button>
                   </div>
-                </form>
+                </div>
               )}
 
               {/* SUB-STEP 2: 4-BOX OTP VERIFICATION */}
               {forgotStep === 'otp' && (
                 <form onSubmit={handleVerifyOtpOnly} className="space-y-4">
                   {/* Status notification banner */}
-                  <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-xs space-y-1">
-                    <div className="flex items-center justify-between font-bold text-emerald-800">
+                  <div className={`p-3.5 rounded-xl text-xs space-y-2 border ${
+                    selectedChannel === 'WHATSAPP'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
+                      : 'bg-blue-50 border-blue-200 text-slate-900'
+                  }`}>
+                    <div className="flex items-center justify-between font-bold">
                       <span className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        {formData.identifier.includes('@') ? 'OTP Sent to Your Email!' : 'OTP Sent to Your Mobile Number!'}
+                        <CheckCircle2 className={`w-4 h-4 shrink-0 ${selectedChannel === 'WHATSAPP' ? 'text-emerald-600' : 'text-blue-600'}`} />
+                        {selectedChannel === 'WHATSAPP'
+                          ? 'OTP Ready for WhatsApp!'
+                          : selectedChannel === 'SMS'
+                            ? 'OTP Sent via SIM SMS!'
+                            : 'OTP Sent to Email!'}
                       </span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono">
+                      <span className="text-[10px] bg-white/80 px-2 py-0.5 rounded-full font-mono border">
                         Attempts: {attemptsLeft}/3
                       </span>
                     </div>
-                    <p className="text-[11px] text-emerald-700 leading-relaxed">
-                      A 4-digit verification code has been dispatched to <strong>{formData.identifier}</strong>. Please check your {formData.identifier.includes('@') ? 'Gmail inbox or Spam folder' : 'phone SMS inbox'} and enter each digit below.
+
+                    <p className="text-[11px] leading-relaxed">
+                      {selectedChannel === 'WHATSAPP' ? (
+                        <>A 4-digit verification code is generated for WhatsApp number <strong>+91 {formData.identifier}</strong>. Click below to view code.</>
+                      ) : selectedChannel === 'SMS' ? (
+                        <>A 4-digit verification code has been dispatched via Brevo SMS to SIM <strong>+91 {formData.identifier}</strong>. Please check your SMS inbox.</>
+                      ) : (
+                        <>A 4-digit verification code has been dispatched to <strong>{formData.identifier}</strong>. Please check your Gmail inbox or Spam folder.</>
+                      )}
                     </p>
+
+                    {/* Direct WhatsApp Open Button if WHATSAPP selected */}
+                    {selectedChannel === 'WHATSAPP' && whatsappUrl && (
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs shadow-sm transition"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        <span>💬 Open WhatsApp to View OTP Code</span>
+                      </a>
+                    )}
                   </div>
 
                   {/* Device Block Alert if 3 wrong attempts */}
@@ -711,7 +795,7 @@ const AuthModal = () => {
                           }}
                           className="flex-1 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
                         >
-                          Change Email
+                          Change Email / Mobile
                         </button>
                         <button
                           type="submit"

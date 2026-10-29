@@ -9,8 +9,12 @@ import com.appzys.ecommerce.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -65,7 +69,7 @@ public class AuthService {
         return user;
     }
 
-    public String sendOtp(ForgotPasswordRequest req) {
+    public Map<String, String> sendOtp(ForgotPasswordRequest req) {
         String id = req.getIdentifier().trim();
         Optional<User> userOpt = id.contains("@") 
             ? userRepository.findByEmail(id.toLowerCase())
@@ -82,29 +86,51 @@ public class AuthService {
         user.setOtpExpiry(LocalDateTime.now().plusMinutes(10));
         userRepository.save(user);
 
+        String channel = (req.getChannel() != null && !req.getChannel().isBlank())
+            ? req.getChannel().trim().toUpperCase()
+            : (id.contains("@") ? "EMAIL" : "WHATSAPP");
+
+        String waLink = "";
+        String cleanPhone = (user.getPhone() != null) ? user.getPhone().replaceAll("[^0-9]", "") : "";
+        if (!cleanPhone.isBlank()) {
+            waLink = "https://api.whatsapp.com/send?phone=91" + cleanPhone + "&text=" + 
+                     URLEncoder.encode("Your APPZYS verification code is: " + otp + ". Valid for 10 minutes.", StandardCharsets.UTF_8);
+        }
+
         System.out.println("=================================================");
-        System.out.println("🔔 [MULTI-CHANNEL OTP DISPATCH] Generating OTP: " + otp + " for " + user.getName());
+        System.out.println("🔔 [CHANNEL: " + channel + "] Generating OTP: " + otp + " for " + user.getName());
 
-        // 1. Dispatch Email OTP via Brevo HTTPS (Port 443)
-        if (user.getEmail() != null && !user.getEmail().isBlank()) {
-            System.out.println("📧 [BREVO EMAIL] Sending OTP to: " + user.getEmail());
-            emailService.sendOtpEmail(user.getEmail(), otp, user.getName());
-        }
+        String message = "OTP generated successfully!";
 
-        // 2. Dispatch Cellular SMS OTP via Brevo SMS / Fast2SMS
-        if (user.getPhone() != null && !user.getPhone().isBlank()) {
-            System.out.println("📱 [CELLULAR SMS] Sending OTP to SIM: +91 " + user.getPhone());
-            smsService.sendOtpSms(user.getPhone(), otp);
-        }
-
-        // 3. Log WhatsApp Notification Channel
-        if (user.getPhone() != null && !user.getPhone().isBlank()) {
-            String waLink = "https://wa.me/91" + user.getPhone() + "?text=" + java.net.URLEncoder.encode("Your APPZYS verification code is: " + otp, java.nio.charset.StandardCharsets.UTF_8);
-            System.out.println("💬 [WHATSAPP CHANNEL READY] Direct verification link: " + waLink);
+        if ("WHATSAPP".equalsIgnoreCase(channel)) {
+            message = "WhatsApp OTP dispatched directly to your WhatsApp!";
+            System.out.println("💬 [WHATSAPP CHANNEL SELECTED] Dispatching via Green-API...");
+            if (!cleanPhone.isBlank()) {
+                smsService.sendWhatsAppOtp(cleanPhone, otp);
+            }
+        } else if ("SMS".equalsIgnoreCase(channel)) {
+            message = "SMS OTP dispatched to your SIM card via TextBee!";
+            if (!cleanPhone.isBlank()) {
+                System.out.println("📱 [TEXTBEE SMS DISPATCH] Sending to +91 " + cleanPhone);
+                smsService.sendOtpSms(cleanPhone, otp);
+            }
+        } else {
+            message = "Email OTP dispatched to your inbox via Brevo!";
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                System.out.println("📧 [BREVO EMAIL DISPATCH] Sending to " + user.getEmail());
+                emailService.sendOtpEmail(user.getEmail(), otp, user.getName());
+            }
         }
         System.out.println("=================================================");
 
-        return otp;
+        Map<String, String> result = new HashMap<>();
+        result.put("otp", otp);
+        result.put("channel", channel);
+        result.put("message", message);
+        result.put("whatsappUrl", waLink);
+        result.put("phone", cleanPhone);
+        result.put("email", user.getEmail());
+        return result;
     }
 
     public boolean validateOtp(String identifier, String otp) {

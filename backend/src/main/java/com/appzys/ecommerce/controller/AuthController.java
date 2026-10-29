@@ -40,11 +40,8 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Map<String, String>>> forgotPassword(@RequestBody ForgotPasswordRequest req) {
         try {
-            String otp = authService.sendOtp(req);
-            return ResponseEntity.ok(ApiResponse.success("OTP sent successfully to your mobile/email!", Map.of(
-                "message", "OTP sent successfully!",
-                "otp", otp
-            )));
+            Map<String, String> res = authService.sendOtp(req);
+            return ResponseEntity.ok(ApiResponse.success(res.get("message"), res));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }

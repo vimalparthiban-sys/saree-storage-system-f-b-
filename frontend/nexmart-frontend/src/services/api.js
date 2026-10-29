@@ -101,10 +101,10 @@ export const api = {
     });
   },
 
-  forgotPassword: async (identifier) => {
+  forgotPassword: async (identifier, channel = null) => {
     return request('/auth/forgot-password', {
       method: 'POST',
-      body: JSON.stringify({ identifier }),
+      body: JSON.stringify({ identifier, channel }),
     });
   },
 
