@@ -298,12 +298,13 @@ const OrderSuccess = () => {
                   Our Chennai central fulfillment team is now packing your box with high-durability stainless steel rods.
                 </p>
                 <div className="pt-1">
-                  <a
-                    href={`/track-order?query=${orderAwb}`}
-                    className="inline-block bg-emerald-600 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-2xs"
+                  <Link
+                    to={`/track-order?query=${orderAwb}`}
+                    onClick={() => setShowWhatsappModal(false)}
+                    className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-2xs transition"
                   >
                     🔗 Click to Live Track Shipment
-                  </a>
+                  </Link>
                 </div>
                 <div className="text-right text-[9px] text-slate-400">
                   10:30 AM <span className="text-blue-500 font-bold">✓✓</span>

@@ -197,7 +197,7 @@ const AuthModal = () => {
 
     const id = formData.identifier.trim();
     if (!id) {
-      setErrorMsg('Please enter your registered email address to receive OTP');
+      setErrorMsg('Please enter your registered email address or mobile number to receive OTP');
       return;
     }
 
@@ -582,16 +582,16 @@ const AuthModal = () => {
                 <form onSubmit={handleSendOtp} className="space-y-3.5">
                   <div className="p-3 bg-blue-50 text-slate-700 rounded-xl text-xs flex items-center gap-2">
                     <Mail className="w-5 h-5 text-[#1c2d4a] shrink-0" />
-                    <span>Enter your registered email address to receive a 4-digit verification code.</span>
+                    <span>Enter your registered email address or 10-digit mobile number to receive a 4-digit verification code.</span>
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 font-bold mb-1">Registered Email Address</label>
+                    <label className="block text-slate-700 font-bold mb-1">Registered Email or Mobile Number</label>
                     <input
-                      type="email"
+                      type="text"
                       required
-                      placeholder="e.g. yourname@gmail.com"
-                      autoComplete="email"
+                      placeholder="e.g. yourname@gmail.com or 9876543210"
+                      autoComplete="username"
                       value={formData.identifier}
                       onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                       className="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-[#1c2d4a]"
@@ -625,14 +625,14 @@ const AuthModal = () => {
                     <div className="flex items-center justify-between font-bold text-emerald-800">
                       <span className="flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        OTP Sent to Your Email!
+                        {formData.identifier.includes('@') ? 'OTP Sent to Your Email!' : 'OTP Sent to Your Mobile Number!'}
                       </span>
                       <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono">
                         Attempts: {attemptsLeft}/3
                       </span>
                     </div>
                     <p className="text-[11px] text-emerald-700 leading-relaxed">
-                      A 4-digit verification code has been dispatched to <strong>{formData.identifier}</strong>. Please check your Gmail inbox or Spam folder and enter each digit below.
+                      A 4-digit verification code has been dispatched to <strong>{formData.identifier}</strong>. Please check your {formData.identifier.includes('@') ? 'Gmail inbox or Spam folder' : 'phone SMS inbox'} and enter each digit below.
                     </p>
                   </div>
 
