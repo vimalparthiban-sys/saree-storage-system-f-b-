@@ -19,6 +19,9 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private SmsService smsService;
+
     public Order createOrder(CreateOrderRequest req) {
         Order order = new Order();
         String orderId = "ORD-2026-" + (1000 + new Random().nextInt(9000));
@@ -36,7 +39,9 @@ public class OrderService {
         order.setCourier("Delhivery Express");
         order.setCreatedAt(LocalDateTime.now());
 
-        if (req.getItems() != null) {
+        String firstItemTitle = "";
+        if (req.getItems() != null && !req.getItems().isEmpty()) {
+            firstItemTitle = req.getItems().get(0).getTitle();
             for (CreateOrderRequest.OrderItemDto itemDto : req.getItems()) {
                 OrderItem item = new OrderItem(
                     itemDto.getProductId(),
@@ -64,7 +69,27 @@ public class OrderService {
         );
         order.getTrackingEvents().add(initialEvent);
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // Auto Dispatch Real WhatsApp Message directly to customer's mobile number via Green-API
+        if (savedOrder.getPhone() != null && !savedOrder.getPhone().isBlank()) {
+            new Thread(() -> {
+                try {
+                    smsService.sendWhatsAppOrderConfirmation(
+                        savedOrder.getPhone(),
+                        savedOrder.getCustomerName(),
+                        savedOrder.getId(),
+                        savedOrder.getAwb(),
+                        savedOrder.getTotalAmount(),
+                        firstItemTitle
+                    );
+                } catch (Exception ex) {
+                    System.err.println("⚠️ [ASYNC WHATSAPP ORDER DISPATCH ERROR] " + ex.getMessage());
+                }
+            }).start();
+        }
+
+        return savedOrder;
     }
 
     public Optional<Order> getOrderById(String orderId) {

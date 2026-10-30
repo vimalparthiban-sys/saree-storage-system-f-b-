@@ -195,29 +195,6 @@ const OrderSuccess = () => {
             </div>
           )}
 
-          {/* WhatsApp 24/7 Automation Banner with Trigger Preview */}
-          <div className="bg-emerald-50 text-emerald-950 p-4 rounded-2xl border border-emerald-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
-            <div className="flex items-start gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
-                <MessageCircle className="w-4 h-4 fill-white" />
-              </div>
-              <div>
-                <p className="font-bold text-emerald-900">24/7 Automated WhatsApp Updates Active</p>
-                <p className="text-[11px] text-emerald-700">
-                  Live dispatch, AWB link, and delivery OTP sent automatically to <strong>{currentOrder?.phone || 'your phone'}</strong>.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowWhatsappModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-xs transition cursor-pointer shrink-0"
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>View WhatsApp Alert</span>
-            </button>
-          </div>
-
           {/* Action Buttons: Live Track + Back to Store */}
           <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
             <Link
@@ -238,104 +215,6 @@ const OrderSuccess = () => {
           </div>
         </div>
       </main>
-
-      {/* WhatsApp Simulated Phone Modal */}
-      {showWhatsappModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-          <div
-            onClick={() => setShowWhatsappModal(false)}
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs"
-          />
-
-          <div className="relative bg-[#efeae2] rounded-3xl max-w-sm w-full shadow-2xl border border-slate-300 z-10 overflow-hidden font-sans">
-            {/* WhatsApp Phone Header */}
-            <div className="bg-[#075e54] text-white p-3.5 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-white text-amber-800 flex items-center justify-center font-serif font-black text-sm">
-                  A
-                </div>
-                <div>
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-xs">APPZYS Official</span>
-                    <span className="bg-emerald-400 text-slate-950 rounded-full w-3 h-3 flex items-center justify-center text-[8px] font-black">
-                      ✓
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-emerald-200 block">Verified Business Account • Online</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowWhatsappModal(false)}
-                className="text-white hover:text-slate-200 cursor-pointer p-1"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* WhatsApp Chat Body */}
-            <div className="p-4 space-y-3 min-h-[300px] text-xs">
-              <div className="text-center">
-                <span className="bg-white/80 text-slate-600 text-[10px] px-2.5 py-1 rounded-lg shadow-2xs">
-                  TODAY
-                </span>
-              </div>
-
-              {/* Bot Message Bubble */}
-              <div className="bg-white p-3 rounded-2xl rounded-tl-xs shadow-xs text-slate-800 space-y-2 border border-slate-200">
-                <p className="font-bold text-amber-900 text-xs">
-                  Namaste {currentOrder?.customerName || 'Vimal P'}! 🥻
-                </p>
-                <p className="text-[11px] leading-relaxed">
-                  Your order <strong>#{currentOrder ? currentOrder.id : orderId}</strong> has been successfully received & confirmed at APPZYS Smart Storage!
-                </p>
-                <div className="bg-slate-50 p-2 rounded-xl text-[10px] space-y-1 border border-slate-100">
-                  <div>📦 <strong>Items:</strong> {currentOrder?.items?.[0]?.title || 'Saree Living Box 60L'}</div>
-                  <div>💰 <strong>Amount:</strong> ₹{currentOrder?.totalAmount || '899'} ({currentOrder?.paymentMethod})</div>
-                  <div>🚚 <strong>Courier:</strong> {courierName}</div>
-                  <div>🏷️ <strong>AWB Code:</strong> {orderAwb}</div>
-                </div>
-                <p className="text-[10px] text-slate-600">
-                  Our Chennai central fulfillment team is now packing your box with high-durability stainless steel rods.
-                </p>
-                <div className="pt-1">
-                  <Link
-                    to={`/track-order?query=${orderAwb}`}
-                    onClick={() => setShowWhatsappModal(false)}
-                    className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-2xs transition"
-                  >
-                    🔗 Click to Live Track Shipment
-                  </Link>
-                </div>
-                <div className="text-right text-[9px] text-slate-400">
-                  10:30 AM <span className="text-blue-500 font-bold">✓✓</span>
-                </div>
-              </div>
-
-              <div className="text-center text-[10px] text-slate-500 pt-2">
-                🔒 End-to-end encrypted official notification.
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-3 bg-white border-t border-slate-200 text-center space-y-2">
-              <a
-                href={`https://api.whatsapp.com/send?phone=91${(currentOrder?.phone || '8072784165').replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Namaste ${currentOrder?.customerName || 'Customer'}! 🥻\nYour order #${currentOrder ? currentOrder.id : orderId} has been confirmed at APPZYS!\n📦 Items: ${currentOrder?.items?.[0]?.title || 'Saree Living Box 60L'}\n💰 Amount: ₹${currentOrder?.totalAmount || '899'}\n🚚 Courier: ${courierName}\n🏷️ AWB: ${orderAwb}\n🔗 Live Tracking: ${window.location.origin}/track-order?query=${orderAwb}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5c] text-white py-2.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer"
-              >
-                <span>💬 Open in Official WhatsApp</span>
-              </a>
-              <button
-                onClick={() => setShowWhatsappModal(false)}
-                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-xl text-xs font-semibold transition cursor-pointer"
-              >
-                Close WhatsApp Preview
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>

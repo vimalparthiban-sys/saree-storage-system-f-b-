@@ -140,6 +140,75 @@ public class SmsService {
         return false;
     }
 
+    /**
+     * Sends a real incoming WhatsApp Order Confirmation directly to customer's WhatsApp via Green-API (Zero cost).
+     * Arrives immediately with push notification & sound when order is placed.
+     */
+    public boolean sendWhatsAppOrderConfirmation(String rawPhoneNumber, String customerName, String orderId, String awbCode, Double totalAmount, String firstItemTitle) {
+        String cleanPhone = rawPhoneNumber.replaceAll("[^0-9]", "");
+        if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
+            cleanPhone = cleanPhone.substring(2);
+        }
+
+        String chatId = "91" + cleanPhone + "@c.us";
+        String name = (customerName != null && !customerName.isBlank()) ? customerName.trim() : "Customer";
+        String trackingLink = "https://saree-storage-system-f-b.onrender.com/track-order?query=" + awbCode;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Vanakkam ").append(name).append("!\n\n");
+        sb.append("Your order *#").append(orderId).append("* has been successfully received & confirmed at *APPZYS Smart Storage*!\n\n");
+        if (firstItemTitle != null && !firstItemTitle.isBlank()) {
+            sb.append("📦 *Items:* ").append(firstItemTitle).append("\n");
+        }
+        sb.append("💰 *Amount:* ₹").append(totalAmount != null ? totalAmount.intValue() : 0).append(" (COD)\n");
+        sb.append("🚚 *Courier:* Delhivery Express\n");
+        sb.append("🏷️ *AWB Code:* ").append(awbCode).append("\n\n");
+        sb.append("Our Chennai central fulfillment team is now packing your box with high-durability stainless steel rods.\n\n");
+        sb.append("🔗 *Live Track Your Order:*\n").append(trackingLink);
+
+        String message = sb.toString();
+
+        System.out.println("==================================================================");
+        System.out.println("💬 [GREEN-API WHATSAPP ORDER DISPATCH] Target WhatsApp: " + chatId);
+        System.out.println("📦 [ORDER ID] " + orderId + " | [AWB] " + awbCode);
+        System.out.println("==================================================================");
+
+        try {
+            String url = String.format("%s/waInstance%s/sendMessage/%s",
+                    greenApiUrl.replaceAll("/+$", ""),
+                    greenApiIdInstance.trim(),
+                    greenApiToken.trim());
+
+            String jsonPayload = String.format(
+                "{\"chatId\":\"%s\",\"message\":\"%s\"}",
+                escapeJson(chatId),
+                escapeJson(message)
+            );
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(10))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("💬 [GREEN-API ORDER DISPATCH STATUS]: " + response.statusCode());
+            System.out.println("💬 [GREEN-API ORDER DISPATCH BODY]: " + response.body());
+
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                System.out.println("✅ [REAL ORDER CONFIRMATION SENT VIA WHATSAPP] Target: " + chatId);
+                return true;
+            }
+        } catch (Exception e) {
+            System.err.println("❌ [GREEN-API ORDER DISPATCH EXCEPTION] " + e.getMessage());
+        }
+
+        return false;
+    }
+
     private String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\")
