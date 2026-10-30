@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { products } from '../data/products';
 import { getProductReviews } from '../data/reviewsData';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -48,6 +49,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { cart, addToCart, removeProductFromCart, setIsCheckoutOpen, setIsSizeGuideOpen, totalItemCount, setIsCartOpen } = useCart();
+  const { user } = useAuth();
   const [mobileSearch, setMobileSearch] = useState('');
 
   const product = products.find((p) => p.id === id) || products[0];
@@ -118,6 +120,42 @@ const ProductDetail = () => {
 
     return () => { isMounted = false; };
   }, [product.id]);
+
+  // Automated WhatsApp Reminder: Track viewed product for logged-in user
+  useEffect(() => {
+    const userPhone = user?.phone || localStorage.getItem('saree_store_user_phone');
+    if (!userPhone) return;
+
+    const sessionKey = `appzys_viewed_${product.id}_${userPhone}`;
+    const alreadyTracked = sessionStorage.getItem(sessionKey);
+    if (alreadyTracked) return;
+
+    // Wait 5 seconds of active product browsing before dispatching WhatsApp reminder
+    const timer = setTimeout(() => {
+      sessionStorage.setItem(sessionKey, 'true');
+
+      // Use absolute HTTPS URL for the product photo so Green-API WhatsApp can download and render it
+      const rawImg = currentImages[0] || product.images[0];
+      const absoluteImgUrl = rawImg.startsWith('http')
+        ? rawImg
+        : `https://saree-storage-system-f-b.onrender.com${rawImg.startsWith('/') ? '' : '/'}${rawImg}`;
+
+      api.trackProductView({
+        phone: userPhone,
+        customerName: user?.name || 'Customer',
+        productId: product.id,
+        productTitle: product.title,
+        price: product.basePrice,
+        imageUrl: absoluteImgUrl
+      }).then(() => {
+        console.log('✅ Automated WhatsApp Retargeting Reminder Dispatched for product:', product.id);
+      }).catch((err) => {
+        console.warn('⚠️ WhatsApp retargeting skipped or failed:', err);
+      });
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [product.id, user, currentImages]);
 
   const totalReviewCount = reviewsList.length;
   const totalPages = Math.ceil(reviewsList.length / reviewsPerPage);

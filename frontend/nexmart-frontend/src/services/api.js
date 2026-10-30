@@ -54,6 +54,13 @@ export const api = {
     return request(`/products/${id}`);
   },
 
+  trackProductView: async (trackData) => {
+    return request('/products/track-view', {
+      method: 'POST',
+      body: JSON.stringify(trackData),
+    });
+  },
+
   // 3. Reviews (Paginated 5 per page from MySQL)
   getReviews: async (productId, page = 1, size = 5) => {
     return request(`/reviews/${productId}?page=${page}&size=${size}`);

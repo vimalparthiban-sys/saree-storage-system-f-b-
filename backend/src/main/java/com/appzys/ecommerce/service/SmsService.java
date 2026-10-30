@@ -209,6 +209,72 @@ public class SmsService {
         return false;
     }
 
+    /**
+     * Sends an Abandoned Cart / Viewed Product reminder WITH REAL IMAGE via Green-API (Zero cost).
+     * Image appears prominently on customer's WhatsApp like Homestrap/IndiaMART!
+     */
+    public boolean sendWhatsAppProductReminder(String rawPhoneNumber, String customerName, String productId, String productTitle, Integer price, String imageUrl) {
+        String cleanPhone = rawPhoneNumber.replaceAll("[^0-9]", "");
+        if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
+            cleanPhone = cleanPhone.substring(2);
+        }
+
+        String chatId = "91" + cleanPhone + "@c.us";
+        String name = (customerName != null && !customerName.isBlank()) ? customerName.trim() : "Friend";
+        String productLink = "https://saree-storage-system-f-b.onrender.com/product/" + productId;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Vanakkam ").append(name).append("! 👋\n\n");
+        sb.append("We noticed you were checking out *").append(productTitle).append("* at APPZYS Smart Storage 🛍️\n\n");
+        sb.append("💰 *Special Price:* ₹").append(price != null ? price : 349).append(" (COD Available)\n");
+        sb.append("🚚 *Delivery:* Express Courier Across India\n\n");
+        sb.append("Still thinking it over? Stocks are moving fast!\n\n");
+        sb.append("👉 *Complete Your Order Here:*\n").append(productLink);
+
+        String caption = sb.toString();
+
+        System.out.println("==================================================================");
+        System.out.println("📸 [GREEN-API WHATSAPP PRODUCT IMAGE DISPATCH] Target: " + chatId);
+        System.out.println("📦 [PRODUCT] " + productTitle + " | [IMG] " + imageUrl);
+        System.out.println("==================================================================");
+
+        try {
+            String url = String.format("%s/waInstance%s/sendFileByUrl/%s",
+                    greenApiUrl.replaceAll("/+$", ""),
+                    greenApiIdInstance.trim(),
+                    greenApiToken.trim());
+
+            String jsonPayload = String.format(
+                "{\"chatId\":\"%s\",\"urlFile\":\"%s\",\"fileName\":\"product.jpg\",\"caption\":\"%s\"}",
+                escapeJson(chatId),
+                escapeJson(imageUrl),
+                escapeJson(caption)
+            );
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(12))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("📸 [GREEN-API IMAGE RESPONSE STATUS]: " + response.statusCode());
+            System.out.println("📸 [GREEN-API IMAGE RESPONSE BODY]: " + response.body());
+
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                System.out.println("✅ [PRODUCT IMAGE WHATSAPP DELIVERED] Target: " + chatId);
+                return true;
+            }
+        } catch (Exception e) {
+            System.err.println("❌ [GREEN-API IMAGE EXCEPTION] " + e.getMessage());
+        }
+
+        return false;
+    }
+
     private String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\")
