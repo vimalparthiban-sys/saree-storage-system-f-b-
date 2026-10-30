@@ -123,14 +123,29 @@ const ProductDetail = () => {
 
   // Automated WhatsApp Reminder: Track viewed product or cart abandoned after 5 minutes
   useEffect(() => {
-    const userPhone = user?.phone || localStorage.getItem('saree_store_user_phone');
+    let userPhone = user?.phone;
+    let userName = user?.name;
+    if (!userPhone) {
+      try {
+        const savedUser = localStorage.getItem('saree_store_user');
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          userPhone = parsed?.phone;
+          userName = parsed?.name;
+        }
+      } catch (e) {}
+    }
+    if (!userPhone) {
+      userPhone = localStorage.getItem('saree_store_user_phone') || localStorage.getItem('saree_user_phone');
+    }
     if (!userPhone) return;
 
-    const sessionKey = `appzys_viewed_${product.id}_${userPhone}`;
+    const sessionKey = `appzys_viewed_${product.id}_${userPhone}_${isProductInCart ? 'cart' : 'view'}`;
     const alreadyTracked = sessionStorage.getItem(sessionKey);
     if (alreadyTracked) return;
 
-    // 5 minutes timer (300,000 ms) before dispatching WhatsApp reminder
+    // Register engagement with backend after 3 seconds of active viewing.
+    // Backend manages the 5-minute countdown so messages arrive even if customer closes browser or mobile tab!
     const timer = setTimeout(() => {
       sessionStorage.setItem(sessionKey, 'true');
 
@@ -142,18 +157,18 @@ const ProductDetail = () => {
 
       api.trackProductView({
         phone: userPhone,
-        customerName: user?.name || 'Customer',
+        customerName: userName || 'Customer',
         productId: product.id,
         productTitle: product.title,
         price: product.basePrice,
         imageUrl: absoluteImgUrl,
         isCart: isProductInCart
       }).then(() => {
-        console.log('✅ Automated WhatsApp Retargeting Reminder Dispatched for product:', product.id);
+        console.log('✅ Automated WhatsApp Retargeting Reminder registered on backend for product:', product.id, '| isCart:', isProductInCart);
       }).catch((err) => {
         console.warn('⚠️ WhatsApp retargeting skipped or failed:', err);
       });
-    }, 5 * 60 * 1000); // Exactly 5 minutes!
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [product.id, user, currentImages, isProductInCart]);

@@ -7,6 +7,7 @@ import com.appzys.ecommerce.entity.TrackingEvent;
 import com.appzys.ecommerce.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -21,6 +22,9 @@ public class OrderService {
 
     @Autowired
     private SmsService smsService;
+
+    @Autowired
+    private AbandonedReminderService abandonedReminderService;
 
     public Order createOrder(CreateOrderRequest req) {
         Order order = new Order();
@@ -40,8 +44,17 @@ public class OrderService {
         order.setCreatedAt(LocalDateTime.now());
 
         String itemTitle = "";
+        String itemColor = "";
+        String itemProductId = "";
+        String itemImgUrl = "";
+
         if (req.getItems() != null && !req.getItems().isEmpty()) {
-            itemTitle = req.getItems().get(0).getTitle();
+            CreateOrderRequest.OrderItemDto firstItem = req.getItems().get(0);
+            itemTitle = firstItem.getTitle();
+            itemColor = firstItem.getColor();
+            itemProductId = firstItem.getProductId();
+            itemImgUrl = firstItem.getImageUrl();
+
             for (CreateOrderRequest.OrderItemDto itemDto : req.getItems()) {
                 OrderItem item = new OrderItem(
                     itemDto.getProductId(),
@@ -56,6 +69,8 @@ public class OrderService {
             }
         }
         final String finalItemTitle = itemTitle;
+        final String finalItemColor = itemColor;
+        final String finalImageUrl = resolveImageUrl(itemProductId, itemColor, itemImgUrl);
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
         String nowTime = LocalDateTime.now().format(timeFormatter);
@@ -72,8 +87,15 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // Auto Dispatch Real WhatsApp Message directly to customer's mobile number via Green-API
+        // Cancel any pending abandoned cart / view reminders for this customer since they purchased!
         if (savedOrder.getPhone() != null && !savedOrder.getPhone().isBlank()) {
+            try {
+                abandonedReminderService.cancelRemindersForPhone(savedOrder.getPhone());
+            } catch (Exception ex) {
+                System.err.println("⚠️ [CANCEL REMINDER ERROR] " + ex.getMessage());
+            }
+
+            // Auto Dispatch Real WhatsApp Confirmation Message WITH PRODUCT PHOTO directly to customer's mobile
             new Thread(() -> {
                 try {
                     smsService.sendWhatsAppOrderConfirmation(
@@ -82,7 +104,9 @@ public class OrderService {
                         savedOrder.getId(),
                         savedOrder.getAwb(),
                         savedOrder.getTotalAmount(),
-                        finalItemTitle
+                        finalItemTitle,
+                        finalItemColor,
+                        finalImageUrl
                     );
                 } catch (Exception ex) {
                     System.err.println("⚠️ [ASYNC WHATSAPP ORDER DISPATCH ERROR] " + ex.getMessage());
@@ -91,6 +115,27 @@ public class OrderService {
         }
 
         return savedOrder;
+    }
+
+    private String resolveImageUrl(String productId, String color, String explicitUrl) {
+        if (explicitUrl != null && !explicitUrl.isBlank()) {
+            if (explicitUrl.startsWith("http")) return explicitUrl;
+            return "https://saree-storage-system-f-b.onrender.com" + (explicitUrl.startsWith("/") ? "" : "/") + explicitUrl;
+        }
+        String c = (color != null) ? color.toLowerCase() : "";
+        if (productId != null && productId.contains("jewel")) {
+            return "https://saree-storage-system-f-b.onrender.com/images/jewel-organiser-1.jpg";
+        }
+        if (c.contains("houndstooth") || c.contains("black")) {
+            return "https://saree-storage-system-f-b.onrender.com/images/saree-organiser-houndstooth-1.jpg";
+        }
+        if (c.contains("floral") || c.contains("brown")) {
+            return "https://saree-storage-system-f-b.onrender.com/images/saree-organiser-brown-floral-1.jpg";
+        }
+        if (c.contains("beige") || c.contains("grid")) {
+            return "https://saree-storage-system-f-b.onrender.com/images/saree-organiser-beige-geometric-1.jpg";
+        }
+        return "https://saree-storage-system-f-b.onrender.com/images/saree-organiser-navy-1.jpg";
     }
 
     public Optional<Order> getOrderById(String orderId) {

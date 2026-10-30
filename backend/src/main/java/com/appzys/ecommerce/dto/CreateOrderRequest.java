@@ -15,6 +15,7 @@ public class CreateOrderRequest {
         private String title;
         private String packName;
         private String color;
+        private String imageUrl;
         private Integer quantity;
         private Integer price;
 
@@ -29,6 +30,9 @@ public class CreateOrderRequest {
 
         public String getColor() { return color; }
         public void setColor(String color) { this.color = color; }
+
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
         public Integer getQuantity() { return quantity; }
         public void setQuantity(Integer quantity) { this.quantity = quantity; }

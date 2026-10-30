@@ -141,10 +141,26 @@ public class SmsService {
     }
 
     /**
-     * Sends a real incoming WhatsApp Order Confirmation directly to customer's WhatsApp via Green-API (Zero cost).
-     * Arrives immediately with push notification & sound when order is placed.
+     * Overload for backwards compatibility
      */
     public boolean sendWhatsAppOrderConfirmation(String rawPhoneNumber, String customerName, String orderId, String awbCode, Number totalAmount, String firstItemTitle) {
+        return sendWhatsAppOrderConfirmation(rawPhoneNumber, customerName, orderId, awbCode, totalAmount, firstItemTitle, null, null);
+    }
+
+    /**
+     * Sends a real incoming WhatsApp Order Confirmation WITH PRODUCT PHOTO directly to customer's WhatsApp via Green-API (Zero cost).
+     * Includes selected Color, AWB code, Amount, and live tracking link.
+     */
+    public boolean sendWhatsAppOrderConfirmation(
+            String rawPhoneNumber,
+            String customerName,
+            String orderId,
+            String awbCode,
+            Number totalAmount,
+            String firstItemTitle,
+            String itemColor,
+            String imageUrl
+    ) {
         String cleanPhone = rawPhoneNumber.replaceAll("[^0-9]", "");
         if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
             cleanPhone = cleanPhone.substring(2);
@@ -160,6 +176,9 @@ public class SmsService {
         if (firstItemTitle != null && !firstItemTitle.isBlank()) {
             sb.append("📦 *Items:* ").append(firstItemTitle).append("\n");
         }
+        if (itemColor != null && !itemColor.isBlank() && !"Standard".equalsIgnoreCase(itemColor.trim())) {
+            sb.append("🎨 *Color:* ").append(itemColor.trim()).append("\n");
+        }
         sb.append("💰 *Amount:* ₹").append(totalAmount != null ? totalAmount.intValue() : 0).append(" (COD)\n");
         sb.append("🚚 *Courier:* Delhivery Express\n");
         sb.append("🏷️ *AWB Code:* ").append(awbCode).append("\n\n");
@@ -170,9 +189,50 @@ public class SmsService {
 
         System.out.println("==================================================================");
         System.out.println("💬 [GREEN-API WHATSAPP ORDER DISPATCH] Target WhatsApp: " + chatId);
-        System.out.println("📦 [ORDER ID] " + orderId + " | [AWB] " + awbCode);
+        System.out.println("📦 [ORDER ID] " + orderId + " | [COLOR] " + itemColor + " | [AWB] " + awbCode);
+        if (imageUrl != null) System.out.println("📸 [PRODUCT IMAGE] " + imageUrl);
         System.out.println("==================================================================");
 
+        // Try sending with product photo first if imageUrl is available
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            try {
+                String sendFileUrl = String.format("%s/waInstance%s/sendFileByUrl/%s",
+                        greenApiUrl.replaceAll("/+$", ""),
+                        greenApiIdInstance.trim(),
+                        greenApiToken.trim());
+
+                String jsonPayload = String.format(
+                    "{\"chatId\":\"%s\",\"urlFile\":\"%s\",\"fileName\":\"order_confirmed.jpg\",\"caption\":\"%s\"}",
+                    escapeJson(chatId),
+                    escapeJson(imageUrl),
+                    escapeJson(message)
+                );
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(sendFileUrl))
+                        .timeout(Duration.ofSeconds(12))
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                System.out.println("📸 [GREEN-API ORDER PHOTO RESPONSE STATUS]: " + response.statusCode());
+                System.out.println("📸 [GREEN-API ORDER PHOTO RESPONSE BODY]: " + response.body());
+
+                if (response.statusCode() == 200 || response.statusCode() == 201) {
+                    System.out.println("✅ [REAL ORDER CONFIRMATION PHOTO DELIVERED VIA WHATSAPP] Target: " + chatId);
+                    return true;
+                } else {
+                    System.err.println("⚠️ [ORDER PHOTO DISPATCH FAILED, FALLING BACK TO TEXT]");
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ [ORDER PHOTO DISPATCH EXCEPTION, FALLING BACK TO TEXT] " + e.getMessage());
+            }
+        }
+
+        // Fallback to text sendMessage
         try {
             String url = String.format("%s/waInstance%s/sendMessage/%s",
                     greenApiUrl.replaceAll("/+$", ""),
@@ -221,7 +281,7 @@ public class SmsService {
 
         String chatId = "91" + cleanPhone + "@c.us";
         String name = (customerName != null && !customerName.isBlank()) ? customerName.trim() : "Friend";
-        String productLink = "https://saree-storage-system-f-b.onrender.com/product/" + productId;
+        String productLink = "https://saree-storage-system-f-b.onrender.com/product/" + (productId != null ? productId : "saree-organiser");
 
         StringBuilder sb = new StringBuilder();
         sb.append("Vanakkam ").append(name).append("! 👋\n\n");
@@ -232,7 +292,7 @@ public class SmsService {
             sb.append("We noticed you were checking out *").append(productTitle).append("* at APPZYS Smart Storage 🛍️\n\n");
             sb.append("Still thinking it over? Stocks are moving fast!\n\n");
         }
-        sb.append("💰 *Special Price:* ₹").append(price != null ? price : 349).append(" (COD Available)\n");
+        sb.append("💰 *Special Price:* ₹").append(price != null ? price : 499).append(" (COD Available)\n");
         sb.append("🚚 *Delivery:* Express Courier Across India\n\n");
         sb.append("👉 *Complete Your Order Here:*\n").append(productLink);
 

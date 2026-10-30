@@ -3,11 +3,12 @@ package com.appzys.ecommerce.controller;
 import com.appzys.ecommerce.dto.ApiResponse;
 import com.appzys.ecommerce.dto.ProductTrackRequest;
 import com.appzys.ecommerce.entity.Product;
+import com.appzys.ecommerce.service.AbandonedReminderService;
 import com.appzys.ecommerce.service.ProductService;
-import com.appzys.ecommerce.service.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -18,7 +19,7 @@ public class ProductController {
     private ProductService productService;
 
     @Autowired
-    private SmsService smsService;
+    private AbandonedReminderService abandonedReminderService;
 
     @GetMapping
     public ApiResponse<List<Product>> getAllProducts() {
@@ -33,28 +34,15 @@ public class ProductController {
     }
 
     /**
-     * Endpoint triggered when a logged-in user views a product without placing an order.
-     * Automatically dispatches a WhatsApp reminder with product photo like Homestrap!
+     * Endpoint triggered when a customer views a product or adds it to cart.
+     * Automatically registers a single scheduled reminder (5 minutes) with product photo.
+     * If user adds to cart, the reminder is upgraded to a cart reminder without duplicate dispatch.
      */
     @PostMapping("/track-view")
     public ApiResponse<String> trackProductView(@RequestBody ProductTrackRequest req) {
-        if (req.getPhone() != null && !req.getPhone().isBlank()) {
-            new Thread(() -> {
-                try {
-                    smsService.sendWhatsAppProductReminder(
-                        req.getPhone(),
-                        req.getCustomerName(),
-                        req.getProductId(),
-                        req.getProductTitle(),
-                        req.getPrice(),
-                        req.getImageUrl(),
-                        Boolean.TRUE.equals(req.getIsCart())
-                    );
-                } catch (Exception e) {
-                    System.err.println("⚠️ [PRODUCT VIEW REMINDER EXCEPTION] " + e.getMessage());
-                }
-            }).start();
+        if (req != null && req.getPhone() != null && !req.getPhone().isBlank()) {
+            abandonedReminderService.scheduleReminder(req);
         }
-        return ApiResponse.success("Product view tracked successfully", "OK");
+        return ApiResponse.success("Product engagement tracked successfully", "OK");
     }
 }

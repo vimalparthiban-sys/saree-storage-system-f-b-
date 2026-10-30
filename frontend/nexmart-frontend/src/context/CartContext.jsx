@@ -51,6 +51,37 @@ export const CartProvider = ({ children }) => {
     if (openDrawer) {
       setIsCartOpen(true);
     }
+
+    // Auto notify backend of Cart engagement so 5-min timer sends Cart Abandoned message
+    try {
+      let storedPhone = null;
+      let storedName = 'Customer';
+      const savedUser = localStorage.getItem('saree_store_user');
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        storedPhone = parsed?.phone;
+        storedName = parsed?.name || 'Customer';
+      }
+      if (!storedPhone) {
+        storedPhone = localStorage.getItem('saree_store_user_phone') || localStorage.getItem('saree_user_phone');
+      }
+
+      if (storedPhone && product) {
+        let rawImg = product.image || (product.images && product.images[0]) || '';
+        const absoluteImgUrl = rawImg ? (rawImg.startsWith('http') ? rawImg : `https://saree-storage-system-f-b.onrender.com${rawImg.startsWith('/') ? '' : '/'}${rawImg}`) : '';
+        api.trackProductView({
+          phone: storedPhone,
+          customerName: storedName,
+          productId: product.id,
+          productTitle: product.title || product.cardTitle,
+          price: product.price || product.basePrice || 499,
+          imageUrl: absoluteImgUrl,
+          isCart: true
+        }).catch(() => {});
+      }
+    } catch (e) {
+      // silent
+    }
   };
 
   const removeFromCart = (index) => {
@@ -117,14 +148,19 @@ export const CartProvider = ({ children }) => {
       address: orderData.address || 'Chennai, Tamil Nadu',
       totalAmount: orderData.totalAmount || cartTotal,
       paymentMethod: orderData.paymentMethod || 'UPI',
-      items: cart.map((item) => ({
-        productId: item.id,
-        title: item.title,
-        packName: item.packName || 'Pack of 1',
-        color: item.color || 'Standard',
-        quantity: item.quantity || 1,
-        price: item.price || 499
-      }))
+      items: cart.map((item) => {
+        let rawImg = item.image || (item.images && item.images[0]) || '';
+        const absoluteImgUrl = rawImg ? (rawImg.startsWith('http') ? rawImg : `https://saree-storage-system-f-b.onrender.com${rawImg.startsWith('/') ? '' : '/'}${rawImg}`) : '';
+        return {
+          productId: item.id,
+          title: item.title,
+          packName: item.packName || 'Pack of 1',
+          color: item.color || 'Standard',
+          imageUrl: absoluteImgUrl,
+          quantity: item.quantity || 1,
+          price: item.price || 499
+        };
+      })
     }).then((res) => {
       console.log('✅ Real order persisted in MySQL via Spring Boot:', res);
     }).catch((err) => {
