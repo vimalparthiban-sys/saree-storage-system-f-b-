@@ -12,22 +12,22 @@ import java.time.Duration;
 @Service
 public class SmsService {
 
-    @Value("${TEXTBEE_API_KEY:txb_O1lnP7GoeOKW9wvnWPJ6bagEHBcCeNBx}")
+    @Value("${textbee.api.key:${TEXTBEE_API_KEY:txb_O1lnP7GoeOKW9wvnWPJ6bagEHBcCeNBx}}")
     private String textbeeApiKey;
 
-    @Value("${TEXTBEE_DEVICE_ID:6ae3470ac1ee0a8dece38ed2}")
+    @Value("${textbee.device.id:${TEXTBEE_DEVICE_ID:6ae3470ac1ee0a8dece38ed2}}")
     private String textbeeDeviceId;
 
-    @Value("${GREEN_API_URL:https://7107.api.greenapi.com}")
+    @Value("${greenapi.url:${GREEN_API_URL:https://7107.api.greenapi.com}}")
     private String greenApiUrl;
 
-    @Value("${GREEN_API_ID_INSTANCE:710722784914}")
+    @Value("${greenapi.id-instance:${GREEN_API_ID_INSTANCE:710722784914}}")
     private String greenApiIdInstance;
 
-    @Value("${GREEN_API_TOKEN:1b0e4b723b9149bfbf7e6eea99a2b1758932f1361c584dfe9a}")
+    @Value("${greenapi.token:${GREEN_API_TOKEN:1b0e4b723b9149bfbf7e6eea99a2b1758932f1361c584dfe9a}}")
     private String greenApiToken;
 
-    @Value("${BREVO_API_KEY:}")
+    @Value("${brevo.api.key:${BREVO_API_KEY:}}")
     private String brevoApiKey;
 
     private final HttpClient httpClient = HttpClient.newBuilder()
