@@ -220,10 +220,8 @@ const AuthModal = () => {
       setOtpBoxes(['', '', '', '']);
       setResendCountdown(RESEND_TIMEOUT_SECONDS); // Start 2:30 timer
 
-      // If WhatsApp channel was chosen, automatically trigger WhatsApp in new tab or app
-      if (channel === 'WHATSAPP' && waLink) {
-        window.open(waLink, '_blank', 'noopener,noreferrer');
-      }
+      // If WhatsApp channel was chosen, we no longer need to popup external waLink
+      // because Green-API sends it directly into their WhatsApp app!
 
       // Auto-focus first OTP input after transition
       setTimeout(() => {
@@ -321,13 +319,18 @@ const AuthModal = () => {
 
     setLoading(true);
     let isValid = false;
+    let failureReason = '';
 
     // Check with backend validateOtp
     try {
       const res = await validateOtp(formData.identifier.trim(), fullOtp);
-      isValid = res.success;
-    } catch (_) {
+      isValid = res && res.success === true;
+      if (!isValid) {
+        failureReason = res?.message || '';
+      }
+    } catch (err) {
       isValid = false;
+      failureReason = err?.message || '';
     }
 
     setLoading(false);
@@ -350,7 +353,7 @@ const AuthModal = () => {
         setBlockedUntil(blockUntilTime);
         setErrorMsg('Device Blocked! You have entered wrong OTP 3 times. For your security, this device is locked for 15 minutes.');
       } else {
-        setErrorMsg(`Wrong OTP! (${newAttempts} of 3 attempts remaining)`);
+        setErrorMsg(failureReason || `Wrong OTP! (${newAttempts} of 3 attempts remaining)`);
         setOtpBoxes(['', '', '', '']);
         otpInputRefs[0].current?.focus();
       }
@@ -698,9 +701,9 @@ const AuthModal = () => {
 
                     <p className="text-[11px] leading-relaxed">
                       {selectedChannel === 'WHATSAPP' ? (
-                        <>A 4-digit verification code is generated for WhatsApp number <strong>+91 {formData.identifier}</strong>. Click below to view code.</>
+                        <>A 4-digit verification code has been dispatched directly to your WhatsApp at <strong>+91 {formData.identifier}</strong>. Please check your WhatsApp messages.</>
                       ) : selectedChannel === 'SMS' ? (
-                        <>A 4-digit verification code has been dispatched via Brevo SMS to SIM <strong>+91 {formData.identifier}</strong>. Please check your SMS inbox.</>
+                        <>A 4-digit verification code has been dispatched to SIM <strong>+91 {formData.identifier}</strong>. Please check your SMS inbox.</>
                       ) : (
                         <>A 4-digit verification code has been dispatched to <strong>{formData.identifier}</strong>. Please check your Gmail inbox or Spam folder.</>
                       )}
