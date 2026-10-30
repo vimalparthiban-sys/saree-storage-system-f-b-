@@ -144,7 +144,7 @@ public class SmsService {
      * Sends a real incoming WhatsApp Order Confirmation directly to customer's WhatsApp via Green-API (Zero cost).
      * Arrives immediately with push notification & sound when order is placed.
      */
-    public boolean sendWhatsAppOrderConfirmation(String rawPhoneNumber, String customerName, String orderId, String awbCode, Double totalAmount, String firstItemTitle) {
+    public boolean sendWhatsAppOrderConfirmation(String rawPhoneNumber, String customerName, String orderId, String awbCode, Number totalAmount, String firstItemTitle) {
         String cleanPhone = rawPhoneNumber.replaceAll("[^0-9]", "");
         if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
             cleanPhone = cleanPhone.substring(2);

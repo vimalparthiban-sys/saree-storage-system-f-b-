@@ -39,9 +39,9 @@ public class OrderService {
         order.setCourier("Delhivery Express");
         order.setCreatedAt(LocalDateTime.now());
 
-        String firstItemTitle = "";
+        String itemTitle = "";
         if (req.getItems() != null && !req.getItems().isEmpty()) {
-            firstItemTitle = req.getItems().get(0).getTitle();
+            itemTitle = req.getItems().get(0).getTitle();
             for (CreateOrderRequest.OrderItemDto itemDto : req.getItems()) {
                 OrderItem item = new OrderItem(
                     itemDto.getProductId(),
@@ -55,6 +55,7 @@ public class OrderService {
                 order.getItems().add(item);
             }
         }
+        final String finalItemTitle = itemTitle;
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
         String nowTime = LocalDateTime.now().format(timeFormatter);
@@ -81,7 +82,7 @@ public class OrderService {
                         savedOrder.getId(),
                         savedOrder.getAwb(),
                         savedOrder.getTotalAmount(),
-                        firstItemTitle
+                        finalItemTitle
                     );
                 } catch (Exception ex) {
                     System.err.println("⚠️ [ASYNC WHATSAPP ORDER DISPATCH ERROR] " + ex.getMessage());
