@@ -708,19 +708,6 @@ const AuthModal = () => {
                         <>A 4-digit verification code has been dispatched to <strong>{formData.identifier}</strong>. Please check your Gmail inbox or Spam folder.</>
                       )}
                     </p>
-
-                    {/* Direct WhatsApp Open Button if WHATSAPP selected */}
-                    {selectedChannel === 'WHATSAPP' && whatsappUrl && (
-                      <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs shadow-sm transition"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        <span>💬 Open WhatsApp to View OTP Code</span>
-                      </a>
-                    )}
                   </div>
 
                   {/* Device Block Alert if 3 wrong attempts */}
