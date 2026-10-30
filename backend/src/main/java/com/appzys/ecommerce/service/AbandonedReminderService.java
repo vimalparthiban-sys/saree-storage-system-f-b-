@@ -33,6 +33,15 @@ public class AbandonedReminderService {
         }
     }
 
+    private String sanitizePhone(String raw) {
+        if (raw == null) return "";
+        String clean = raw.replaceAll("[^0-9]", "");
+        if (clean.length() == 12 && clean.startsWith("91")) {
+            return clean.substring(2);
+        }
+        return clean;
+    }
+
     /**
      * Schedules a WhatsApp reminder 5 minutes after a user views a product or adds to cart.
      * If user later adds to cart, the existing view reminder is upgraded to a cart reminder.
@@ -43,10 +52,8 @@ public class AbandonedReminderService {
             return;
         }
 
-        String cleanPhone = req.getPhone().replaceAll("[^0-9]", "");
-        if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
-            cleanPhone = cleanPhone.substring(2);
-        }
+        final String cleanPhone = sanitizePhone(req.getPhone());
+        if (cleanPhone.isBlank()) return;
 
         // Suppress if order was placed within the last 2 hours
         Long lastOrderTime = completedOrdersPhoneTimestamp.get(cleanPhone);
@@ -56,7 +63,7 @@ public class AbandonedReminderService {
         }
 
         String prodId = (req.getProductId() != null && !req.getProductId().isBlank()) ? req.getProductId() : "saree-organiser";
-        String key = cleanPhone + "_" + prodId;
+        final String key = cleanPhone + "_" + prodId;
         boolean isNewCart = Boolean.TRUE.equals(req.getIsCart());
 
         ReminderTask existing = pendingReminders.get(key);
@@ -109,10 +116,8 @@ public class AbandonedReminderService {
     public void cancelRemindersForPhone(String rawPhone) {
         if (rawPhone == null || rawPhone.isBlank()) return;
 
-        String cleanPhone = rawPhone.replaceAll("[^0-9]", "");
-        if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
-            cleanPhone = cleanPhone.substring(2);
-        }
+        final String cleanPhone = sanitizePhone(rawPhone);
+        if (cleanPhone.isBlank()) return;
 
         completedOrdersPhoneTimestamp.put(cleanPhone, System.currentTimeMillis());
 
