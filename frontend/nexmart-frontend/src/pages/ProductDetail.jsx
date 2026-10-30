@@ -121,7 +121,7 @@ const ProductDetail = () => {
     return () => { isMounted = false; };
   }, [product.id]);
 
-  // Automated WhatsApp Reminder: Track viewed product for logged-in user
+  // Automated WhatsApp Reminder: Track viewed product or cart abandoned after 5 minutes
   useEffect(() => {
     const userPhone = user?.phone || localStorage.getItem('saree_store_user_phone');
     if (!userPhone) return;
@@ -130,7 +130,7 @@ const ProductDetail = () => {
     const alreadyTracked = sessionStorage.getItem(sessionKey);
     if (alreadyTracked) return;
 
-    // Wait 5 seconds of active product browsing before dispatching WhatsApp reminder
+    // 5 minutes timer (300,000 ms) before dispatching WhatsApp reminder
     const timer = setTimeout(() => {
       sessionStorage.setItem(sessionKey, 'true');
 
@@ -146,16 +146,17 @@ const ProductDetail = () => {
         productId: product.id,
         productTitle: product.title,
         price: product.basePrice,
-        imageUrl: absoluteImgUrl
+        imageUrl: absoluteImgUrl,
+        isCart: isProductInCart
       }).then(() => {
         console.log('✅ Automated WhatsApp Retargeting Reminder Dispatched for product:', product.id);
       }).catch((err) => {
         console.warn('⚠️ WhatsApp retargeting skipped or failed:', err);
       });
-    }, 5000);
+    }, 5 * 60 * 1000); // Exactly 5 minutes!
 
     return () => clearTimeout(timer);
-  }, [product.id, user, currentImages]);
+  }, [product.id, user, currentImages, isProductInCart]);
 
   const totalReviewCount = reviewsList.length;
   const totalPages = Math.ceil(reviewsList.length / reviewsPerPage);
@@ -398,13 +399,19 @@ const ProductDetail = () => {
 
       {/* Mobile Top Navigation (Flipkart Style: Back Arrow + Search + Cart) */}
       <header className="md:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 py-2 flex items-center gap-2 shadow-2xs">
-        {/* Simple Click Back Button */}
+        {/* Smart Click Back Button: If opened directly from WhatsApp, navigate to Home "/" */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 2) {
+              navigate(-1);
+            } else {
+              navigate('/');
+            }
+          }}
           type="button"
           className="p-1.5 -ml-1 text-slate-800 hover:bg-slate-100 rounded-full transition cursor-pointer active:scale-95 shrink-0"
-          aria-label="Back"
-          title="Back"
+          aria-label="Back to Home"
+          title="Back to Home"
         >
           <ArrowLeft className="w-5 h-5 stroke-[2.3]" />
         </button>

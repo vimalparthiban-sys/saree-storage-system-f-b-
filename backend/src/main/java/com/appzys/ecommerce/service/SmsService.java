@@ -213,7 +213,7 @@ public class SmsService {
      * Sends an Abandoned Cart / Viewed Product reminder WITH REAL IMAGE via Green-API (Zero cost).
      * Image appears prominently on customer's WhatsApp like Homestrap/IndiaMART!
      */
-    public boolean sendWhatsAppProductReminder(String rawPhoneNumber, String customerName, String productId, String productTitle, Integer price, String imageUrl) {
+    public boolean sendWhatsAppProductReminder(String rawPhoneNumber, String customerName, String productId, String productTitle, Integer price, String imageUrl, boolean isCartAbandoned) {
         String cleanPhone = rawPhoneNumber.replaceAll("[^0-9]", "");
         if (cleanPhone.length() == 12 && cleanPhone.startsWith("91")) {
             cleanPhone = cleanPhone.substring(2);
@@ -225,16 +225,21 @@ public class SmsService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Vanakkam ").append(name).append("! 👋\n\n");
-        sb.append("We noticed you were checking out *").append(productTitle).append("* at APPZYS Smart Storage 🛍️\n\n");
+        if (isCartAbandoned) {
+            sb.append("Hey there, we noticed you left *").append(productTitle).append("* in your cart 🛍️\n\n");
+            sb.append("Still thinking it over? It's waiting for you! Don't miss out on your order.\n\n");
+        } else {
+            sb.append("We noticed you were checking out *").append(productTitle).append("* at APPZYS Smart Storage 🛍️\n\n");
+            sb.append("Still thinking it over? Stocks are moving fast!\n\n");
+        }
         sb.append("💰 *Special Price:* ₹").append(price != null ? price : 349).append(" (COD Available)\n");
         sb.append("🚚 *Delivery:* Express Courier Across India\n\n");
-        sb.append("Still thinking it over? Stocks are moving fast!\n\n");
         sb.append("👉 *Complete Your Order Here:*\n").append(productLink);
 
         String caption = sb.toString();
 
         System.out.println("==================================================================");
-        System.out.println("📸 [GREEN-API WHATSAPP PRODUCT IMAGE DISPATCH] Target: " + chatId);
+        System.out.println("📸 [GREEN-API WHATSAPP " + (isCartAbandoned ? "CART" : "VIEW") + " REMINDER] Target: " + chatId);
         System.out.println("📦 [PRODUCT] " + productTitle + " | [IMG] " + imageUrl);
         System.out.println("==================================================================");
 

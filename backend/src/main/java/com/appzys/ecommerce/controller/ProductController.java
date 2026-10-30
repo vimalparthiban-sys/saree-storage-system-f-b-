@@ -47,7 +47,8 @@ public class ProductController {
                         req.getProductId(),
                         req.getProductTitle(),
                         req.getPrice(),
-                        req.getImageUrl()
+                        req.getImageUrl(),
+                        Boolean.TRUE.equals(req.getIsCart())
                     );
                 } catch (Exception e) {
                     System.err.println("⚠️ [PRODUCT VIEW REMINDER EXCEPTION] " + e.getMessage());

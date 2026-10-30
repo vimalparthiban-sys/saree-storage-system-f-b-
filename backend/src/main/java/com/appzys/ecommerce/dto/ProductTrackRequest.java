@@ -7,6 +7,7 @@ public class ProductTrackRequest {
     private String productTitle;
     private Integer price;
     private String imageUrl;
+    private Boolean isCart;
 
     public ProductTrackRequest() {}
 
@@ -27,4 +28,7 @@ public class ProductTrackRequest {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public Boolean getIsCart() { return isCart; }
+    public void setIsCart(Boolean isCart) { this.isCart = isCart; }
 }
