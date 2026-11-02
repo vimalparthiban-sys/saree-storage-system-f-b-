@@ -38,6 +38,11 @@ public class OrderService {
         order.setTotalAmount(req.getTotalAmount());
         order.setPaymentMethod(req.getPaymentMethod());
         order.setPaymentStatus("COD".equalsIgnoreCase(req.getPaymentMethod()) ? "PENDING" : "PAID");
+        order.setRazorpayOrderId(req.getRazorpayOrderId());
+        order.setRazorpayPaymentId(req.getRazorpayPaymentId());
+        order.setUpiUtr(req.getUpiUtr());
+        order.setCardLast4(req.getCardLast4());
+        order.setCardNetwork(req.getCardNetwork());
         order.setStatus("CONFIRMED");
         order.setAwb(awb);
         order.setCourier("Delhivery Express");

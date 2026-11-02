@@ -4,6 +4,7 @@ C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\app
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\controller\AuthController.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\controller\HealthController.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\controller\OrderController.java
+C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\controller\PaymentController.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\controller\ProductController.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\controller\ReviewController.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\dto\ApiResponse.java
@@ -14,6 +15,7 @@ C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\app
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\dto\ProductTrackRequest.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\dto\RegisterRequest.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\dto\VerifyOtpRequest.java
+C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\dto\VerifyPaymentRequest.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\entity\Order.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\entity\OrderItem.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\entity\Product.java
@@ -29,6 +31,7 @@ C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\app
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\AuthService.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\EmailService.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\OrderService.java
+C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\PaymentService.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\ProductService.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\ReviewService.java
 C:\Users\vimal\OneDrive\Desktop\storage e commerce\backend\src\main\java\com\appzys\ecommerce\service\SmsService.java

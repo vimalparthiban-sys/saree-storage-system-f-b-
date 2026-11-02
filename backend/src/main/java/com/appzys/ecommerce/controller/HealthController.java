@@ -15,7 +15,7 @@ public class HealthController {
         return ApiResponse.success("APPZYS Spring Boot Backend is healthy and running!", Map.of(
             "status", "UP",
             "version", "1.0.0",
-            "framework", "Spring Boot 3.3.4 (Java 21)",
+            "framework", "Spring Boot 3.3.4 (Java " + Runtime.version().feature() + ")",
             "store", "APPZYS Smart Storage Solutions"
         ));
     }

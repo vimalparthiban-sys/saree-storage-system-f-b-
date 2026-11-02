@@ -8,6 +8,11 @@ public class CreateOrderRequest {
     private String address;
     private Integer totalAmount;
     private String paymentMethod;
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private String upiUtr;
+    private String cardLast4;
+    private String cardNetwork;
     private List<OrderItemDto> items;
 
     public static class OrderItemDto {
@@ -55,6 +60,21 @@ public class CreateOrderRequest {
 
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public String getRazorpayOrderId() { return razorpayOrderId; }
+    public void setRazorpayOrderId(String razorpayOrderId) { this.razorpayOrderId = razorpayOrderId; }
+
+    public String getRazorpayPaymentId() { return razorpayPaymentId; }
+    public void setRazorpayPaymentId(String razorpayPaymentId) { this.razorpayPaymentId = razorpayPaymentId; }
+
+    public String getUpiUtr() { return upiUtr; }
+    public void setUpiUtr(String upiUtr) { this.upiUtr = upiUtr; }
+
+    public String getCardLast4() { return cardLast4; }
+    public void setCardLast4(String cardLast4) { this.cardLast4 = cardLast4; }
+
+    public String getCardNetwork() { return cardNetwork; }
+    public void setCardNetwork(String cardNetwork) { this.cardNetwork = cardNetwork; }
 
     public List<OrderItemDto> getItems() { return items; }
     public void setItems(List<OrderItemDto> items) { this.items = items; }

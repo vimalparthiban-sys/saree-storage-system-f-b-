@@ -93,6 +93,25 @@ export const api = {
     return request(`/orders/user/${phone}`);
   },
 
+  // 4b. Payments (Razorpay & Instant UPI / Card Verification)
+  getPaymentConfig: async () => {
+    return request('/payments/config');
+  },
+
+  createPaymentOrder: async (paymentData) => {
+    return request('/payments/create-order', {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    });
+  },
+
+  verifyPayment: async (verifyData) => {
+    return request('/payments/verify', {
+      method: 'POST',
+      body: JSON.stringify(verifyData),
+    });
+  },
+
   // 5. User Authentication & Accounts (MySQL)
   register: async (userData) => {
     return request('/auth/register', {

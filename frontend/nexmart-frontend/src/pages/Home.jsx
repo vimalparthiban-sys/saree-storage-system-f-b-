@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { products } from '../data/products';
 import AnnouncementBar from '../components/AnnouncementBar';
 import Navbar from '../components/Navbar';
+import TrustAssuranceBar from '../components/TrustAssuranceBar';
+import BeforeAfterSlider from '../components/BeforeAfterSlider';
 import FeatureHighlights from '../components/FeatureHighlights';
 import NewsletterBanner from '../components/NewsletterBanner';
 import Footer from '../components/Footer';
@@ -180,6 +182,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Trust & Value Assurance Bar (Free Express Delivery, COD, 4.9 Rating, 7-Day Replacement) */}
+      <TrustAssuranceBar />
 
       <main className="flex-1 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 w-full space-y-6 sm:space-y-12">
         
@@ -368,8 +373,11 @@ const Home = () => {
           ))}
         </div>
 
-        {/* 4. Brand Feature Highlights */}
-        <FeatureHighlights />
+        {/* 4. Interactive Wardrobe Transformation Slider (Before vs After) */}
+        <BeforeAfterSlider />
+
+        {/* 5. Category-Specific Feature Highlights (Shown only when Saree or Jewellery category is active) */}
+        <FeatureHighlights category={activeCategory} />
 
       </main>
 

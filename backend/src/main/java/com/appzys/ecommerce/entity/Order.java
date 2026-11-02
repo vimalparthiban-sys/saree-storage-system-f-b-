@@ -19,9 +19,15 @@ public class Order {
     private String address;
 
     private Integer totalAmount;
-    private String paymentMethod; // 'UPI', 'COD'
+    private String paymentMethod; // 'UPI', 'CARD', 'COD'
     private String paymentStatus; // 'PAID', 'PENDING'
     private String status;        // 'CONFIRMED', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'
+
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private String upiUtr;
+    private String cardLast4;
+    private String cardNetwork;
 
     private String awb;           // 'AWB-DEL-982140'
     private String courier;       // 'Delhivery Express', 'Bluedart Priority'
@@ -59,6 +65,21 @@ public class Order {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getRazorpayOrderId() { return razorpayOrderId; }
+    public void setRazorpayOrderId(String razorpayOrderId) { this.razorpayOrderId = razorpayOrderId; }
+
+    public String getRazorpayPaymentId() { return razorpayPaymentId; }
+    public void setRazorpayPaymentId(String razorpayPaymentId) { this.razorpayPaymentId = razorpayPaymentId; }
+
+    public String getUpiUtr() { return upiUtr; }
+    public void setUpiUtr(String upiUtr) { this.upiUtr = upiUtr; }
+
+    public String getCardLast4() { return cardLast4; }
+    public void setCardLast4(String cardLast4) { this.cardLast4 = cardLast4; }
+
+    public String getCardNetwork() { return cardNetwork; }
+    public void setCardNetwork(String cardNetwork) { this.cardNetwork = cardNetwork; }
 
     public String getAwb() { return awb; }
     public void setAwb(String awb) { this.awb = awb; }
