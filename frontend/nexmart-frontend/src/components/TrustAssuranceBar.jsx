@@ -30,22 +30,23 @@ const TrustAssuranceBar = () => {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 w-full">
-      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+    <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-3 w-full">
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-slate-200/90 shadow-2xs">
+        {/* Mobile: Smooth single-row horizontal swipe with snap (like product cards) | Desktop: 4 columns grid */}
+        <div className="flex md:grid md:grid-cols-4 gap-3 sm:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory py-0.5 md:py-0 md:divide-x md:divide-slate-100">
           {assurances.map((item, idx) => (
             <div
               key={idx}
-              className={`flex items-center gap-3 ${idx >= 2 ? 'pt-3 sm:pt-0' : ''} sm:px-3 first:pl-0 last:pr-0`}
+              className="shrink-0 snap-start flex items-center gap-3 bg-slate-50/70 md:bg-transparent p-2.5 sm:p-3 md:p-0 rounded-xl md:rounded-none border border-slate-100 md:border-0 min-w-[210px] sm:min-w-[230px] md:min-w-0 md:px-3 first:md:pl-0 last:md:pr-0"
             >
               <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl ${item.bg} border flex items-center justify-center shrink-0 shadow-2xs`}>
                 {item.icon}
               </div>
               <div className="min-w-0">
-                <div className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                <div className="font-bold text-slate-900 text-xs sm:text-sm whitespace-nowrap">
                   {item.title}
                 </div>
-                <div className="text-[11px] sm:text-xs text-slate-500 truncate">
+                <div className="text-[11px] sm:text-xs text-slate-500 whitespace-nowrap">
                   {item.subtitle}
                 </div>
               </div>

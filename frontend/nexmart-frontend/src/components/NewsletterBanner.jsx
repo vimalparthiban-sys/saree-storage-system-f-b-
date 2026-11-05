@@ -34,7 +34,7 @@ const NewsletterBanner = () => {
   };
 
   return (
-    <section className="relative overflow-hidden py-16 px-4 border-t border-b border-slate-200">
+    <section className="relative overflow-hidden py-7 sm:py-16 px-3 sm:px-4 border-t border-b border-slate-200">
       {/* Background Image with warm luxury interior aesthetic */}
       <div
         className="absolute inset-0 bg-cover bg-center"
@@ -45,20 +45,20 @@ const NewsletterBanner = () => {
       {/* Dark warm translucent vignette overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-stone-950/85 via-stone-900/80 to-amber-950/85 backdrop-blur-[2px]" />
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6 text-white">
+      <div className="relative z-10 max-w-4xl mx-auto text-center space-y-3.5 sm:space-y-6 text-white">
         
         {/* Top Tag */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-400/30">
-          <Sparkles className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] sm:text-xs font-semibold border border-amber-400/30">
+          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           <span>JOIN 12,000+ WARDROBE ENTHUSIASTS</span>
         </div>
 
         {/* Title & Subtitle matching original aesthetic */}
-        <div className="space-y-2">
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-amber-50">
+        <div className="space-y-1 sm:space-y-2">
+          <h2 className="text-xl sm:text-3xl md:text-4xl font-serif font-bold tracking-tight text-amber-50 leading-tight">
             Keep Useful Things Coming
           </h2>
-          <p className="text-stone-300 text-xs sm:text-sm max-w-xl mx-auto font-normal leading-relaxed">
+          <p className="text-stone-300 text-[11px] sm:text-sm max-w-xl mx-auto font-normal leading-snug sm:leading-relaxed">
             New launches, wardrobe organizing ideas, and special festive offers — straight to your inbox.
           </p>
         </div>
@@ -66,36 +66,36 @@ const NewsletterBanner = () => {
         {/* Form or Success State */}
         {!isSubscribed ? (
           <form onSubmit={handleSubmit} className="max-w-xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-center gap-2 p-1.5 bg-stone-950/60 backdrop-blur-md rounded-2xl border border-stone-600/60 shadow-xl">
+            <div className="flex flex-col sm:flex-row items-center gap-2 p-1 sm:p-1.5 bg-stone-950/60 backdrop-blur-md rounded-xl sm:rounded-2xl border border-stone-600/60 shadow-xl">
               <div className="relative flex-1 w-full">
-                <Mail className="w-4 h-4 text-stone-400 absolute left-4 top-3.5" />
+                <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-2.5 sm:top-3.5" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email address"
-                  className="w-full pl-11 pr-4 py-3 bg-transparent text-white placeholder-stone-400 text-xs sm:text-sm focus:outline-hidden"
+                  className="w-full pl-10 pr-3 py-2 sm:py-3 bg-transparent text-white placeholder-stone-400 text-xs sm:text-sm focus:outline-hidden"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full sm:w-auto px-7 py-3 rounded-xl bg-[#1c2d4a] hover:bg-[#15233a] text-white font-bold text-xs sm:text-sm transition duration-200 cursor-pointer shadow-md disabled:opacity-50 shrink-0 border border-white/20"
+                className="w-full sm:w-auto px-5 sm:px-7 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-[#1c2d4a] hover:bg-[#15233a] text-white font-bold text-xs sm:text-sm transition duration-200 cursor-pointer shadow-md disabled:opacity-50 shrink-0 border border-white/20"
               >
                 {loading ? 'Subscribing...' : 'Subscribe Now'}
               </button>
             </div>
           </form>
         ) : (
-          <div className="max-w-xl mx-auto p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 backdrop-blur-md text-emerald-200 flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold animate-in fade-in">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div className="max-w-xl mx-auto p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-emerald-950/80 border border-emerald-500/50 backdrop-blur-md text-emerald-200 flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 shrink-0" />
             <span>Thanks for subscribing! Check your inbox for a 10% welcome coupon.</span>
           </div>
         )}
 
-        <p className="text-[11px] text-stone-400">
+        <p className="text-[10px] sm:text-[11px] text-stone-400">
           No spam, ever. Unsubscribe anytime with 1 click.
         </p>
 

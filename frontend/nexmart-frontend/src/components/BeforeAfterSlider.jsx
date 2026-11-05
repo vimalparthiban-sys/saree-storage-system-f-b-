@@ -225,7 +225,7 @@ const BeforeAfterSlider = () => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleMouseUp}
-            className="relative w-full aspect-[16/10] sm:aspect-[1024/462] min-h-[380px] sm:min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden select-none border border-slate-200/90 shadow-md bg-slate-950 cursor-ew-resize"
+            className="relative w-full aspect-[16/10] sm:aspect-[1024/462] min-h-[220px] sm:min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden select-none border border-slate-200/90 shadow-md bg-slate-950 cursor-ew-resize"
           >
             {/* ================= AFTER LAYER (Bottom Layer / Full Container) ================= */}
             <div className="absolute inset-0 select-none">
@@ -233,24 +233,24 @@ const BeforeAfterSlider = () => {
                 key={`after-${current.id}`}
                 src={current.afterImg}
                 alt={`${current.name} After Transformation`}
-                className="w-full h-full object-cover block select-none pointer-events-none transition-opacity duration-500"
+                className="w-full h-full object-contain sm:object-cover block select-none pointer-events-none transition-opacity duration-500"
                 loading="lazy"
               />
 
-              {/* Dark scrim overlay positioned at RIGHT TOP */}
-              <div className="absolute inset-y-0 right-0 w-full sm:w-3/5 bg-gradient-to-l from-black/85 via-black/50 to-transparent flex items-start justify-end p-4 sm:p-6 md:p-8 pt-6 sm:pt-8 md:pt-10 pointer-events-none">
-                <div key={`after-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-start sm:items-end text-left sm:text-right space-y-2 sm:space-y-2.5 transition-all duration-300">
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 text-[11px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
+              {/* Dark scrim overlay centered vertically to align with slider line */}
+              <div className="absolute inset-y-0 right-0 w-full sm:w-3/5 bg-gradient-to-l from-black/90 via-black/60 to-transparent flex items-center justify-center sm:justify-end p-3 sm:p-6 md:p-8 pointer-events-none">
+                <div key={`after-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-center sm:items-end text-center sm:text-right space-y-1 sm:space-y-2.5 transition-all duration-300">
+                  <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
                     {current.afterBadge}
                   </span>
-                  <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white leading-tight drop-shadow-md">
+                  <h3 className="text-base sm:text-2xl md:text-3xl font-serif font-bold text-white leading-snug sm:leading-tight drop-shadow-md">
                     {current.afterTitle}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed drop-shadow-sm">
+                  <p className="text-[11px] sm:text-sm text-slate-200 leading-snug sm:leading-relaxed drop-shadow-sm max-w-xs sm:max-w-none line-clamp-2 sm:line-clamp-none">
                     {current.afterDesc}
                   </p>
                   <div className="pt-0.5">
-                    <span className="inline-block text-[11px] font-bold text-amber-300 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300/40 shadow-sm">
+                    <span className="inline-block text-[10px] sm:text-[11px] font-bold text-amber-300 bg-black/40 backdrop-blur-md px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/40 shadow-sm">
                       {current.afterPill}
                     </span>
                   </div>
@@ -272,24 +272,24 @@ const BeforeAfterSlider = () => {
                   key={`before-${current.id}`}
                   src={current.beforeImg}
                   alt={`${current.name} Before Transformation`}
-                  className="w-full h-full object-cover block select-none pointer-events-none transition-opacity duration-500"
+                  className="w-full h-full object-contain sm:object-cover block select-none pointer-events-none transition-opacity duration-500"
                   loading="lazy"
                 />
 
-                {/* Dark scrim overlay positioned at LEFT TOP */}
-                <div className="absolute inset-y-0 left-0 w-full sm:w-3/5 bg-gradient-to-r from-black/85 via-black/50 to-transparent flex items-start justify-start p-4 sm:p-6 md:p-8 pt-6 sm:pt-8 md:pt-10 pointer-events-none">
-                  <div key={`before-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-start text-left space-y-2 sm:space-y-2.5 transition-all duration-300">
-                    <span className="px-3 py-1 rounded-full bg-rose-500/30 text-rose-300 border border-rose-400/50 text-[11px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
+                {/* Dark scrim overlay centered vertically to align with slider line */}
+                <div className="absolute inset-y-0 left-0 w-full sm:w-3/5 bg-gradient-to-r from-black/90 via-black/60 to-transparent flex items-center justify-center sm:justify-start p-3 sm:p-6 md:p-8 pointer-events-none">
+                  <div key={`before-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-center sm:items-start text-center sm:text-left space-y-1 sm:space-y-2.5 transition-all duration-300">
+                    <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-rose-500/30 text-rose-300 border border-rose-400/50 text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
                       {current.beforeBadge}
                     </span>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-white leading-tight drop-shadow-md">
+                    <h3 className="text-base sm:text-2xl md:text-3xl font-serif font-bold text-white leading-snug sm:leading-tight drop-shadow-md">
                       {current.beforeTitle}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed drop-shadow-sm">
+                    <p className="text-[11px] sm:text-sm text-slate-200 leading-snug sm:leading-relaxed drop-shadow-sm max-w-xs sm:max-w-none line-clamp-2 sm:line-clamp-none">
                       {current.beforeDesc}
                     </p>
                     <div className="pt-0.5">
-                      <span className="inline-block text-[11px] font-bold text-amber-300 bg-black/45 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300/40 shadow-sm">
+                      <span className="inline-block text-[10px] sm:text-[11px] font-bold text-amber-300 bg-black/45 backdrop-blur-md px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/40 shadow-sm">
                         {current.beforePill}
                       </span>
                     </div>

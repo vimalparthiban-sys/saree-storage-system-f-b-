@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Home from './pages/Home';
@@ -16,9 +16,19 @@ import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AuthModal from './components/AuthModal';
 
+// Scrolls window to top whenever navigation route or query parameter changes
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname, search]);
+  return null;
+}
+
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <CartProvider>
           {/* Main Page Routes */}
