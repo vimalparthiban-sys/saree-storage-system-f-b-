@@ -41,7 +41,7 @@ const transformationProducts = [
   }
 ];
 
-const BeforeAfterSlider = () => {
+const BeforeAfterSlider = ({ activeCategory }) => {
   const [productIdx, setProductIdx] = useState(0);
   const [sliderPos, setSliderPos] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -52,6 +52,17 @@ const BeforeAfterSlider = () => {
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
   const resumeTimerRef = useRef(null);
+
+  // Sync category selection: saree organiser = product 0, jewellery organiser = product 1 (Item 6)
+  useEffect(() => {
+    if (activeCategory === 'saree-organiser') {
+      setProductIdx(0);
+      setSliderPos(50);
+    } else if (activeCategory === 'jewel-organiser') {
+      setProductIdx(1);
+      setSliderPos(50);
+    }
+  }, [activeCategory]);
 
   const current = transformationProducts[productIdx];
 
@@ -81,10 +92,10 @@ const BeforeAfterSlider = () => {
     return () => observer.disconnect();
   }, []);
 
-  // 2. Automatic Movement Action: Cycles products (image + text) automatically when viewing
+  // 2. Automatic Movement Action: Cycles products only when 'All' category is active
   useEffect(() => {
-    // If not visible on screen, or if user is touching/sliding, pause automatic action
-    if (!isVisible || isUserInteracting || isDragging) return;
+    // If not visible on screen, or if user is touching/sliding, or if category is filtered, pause automatic action
+    if (!isVisible || isUserInteracting || isDragging || activeCategory) return;
 
     const interval = setInterval(() => {
       setProductIdx((prev) => (prev + 1) % transformationProducts.length);
@@ -92,7 +103,7 @@ const BeforeAfterSlider = () => {
     }, 4500); // 4.5 seconds cycle
 
     return () => clearInterval(interval);
-  }, [isVisible, isUserInteracting, isDragging]);
+  }, [isVisible, isUserInteracting, isDragging, activeCategory]);
 
   const updateContainerWidth = useCallback(() => {
     if (containerRef.current) {
@@ -193,27 +204,30 @@ const BeforeAfterSlider = () => {
         {/* Relative Container with Navigation Arrows in the Gutter between Image & Outer Box */}
         <div className="relative">
           
-          {/* Left Arrow Button */}
-          <button
-            type="button"
-            onClick={handlePrevProduct}
-            aria-label="Previous product transformation"
-            title="View previous product"
-            className="absolute -left-2.5 sm:-left-4 md:-left-5 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-[#1c2d4a] shadow-xl border border-slate-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer hover:bg-slate-50"
-          >
-            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-[#1c2d4a] stroke-[2.5]" />
-          </button>
+          {/* Left / Right Carousel Arrow Buttons (Shown when 'All' category is active) */}
+          {!activeCategory && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevProduct}
+                aria-label="Previous product transformation"
+                title="View previous product"
+                className="absolute -left-2.5 sm:-left-4 md:-left-5 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-[#1c2d4a] shadow-xl border border-slate-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer hover:bg-slate-50"
+              >
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-[#1c2d4a] stroke-[2.5]" />
+              </button>
 
-          {/* Right Arrow Button */}
-          <button
-            type="button"
-            onClick={handleNextProduct}
-            aria-label="Next product transformation"
-            title="View next product"
-            className="absolute -right-2.5 sm:-right-4 md:-right-5 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-[#1c2d4a] shadow-xl border border-slate-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer hover:bg-slate-50"
-          >
-            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#1c2d4a] stroke-[2.5]" />
-          </button>
+              <button
+                type="button"
+                onClick={handleNextProduct}
+                aria-label="Next product transformation"
+                title="View next product"
+                className="absolute -right-2.5 sm:-right-4 md:-right-5 top-1/2 -translate-y-1/2 z-30 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-[#1c2d4a] shadow-xl border border-slate-200 flex items-center justify-center hover:scale-110 active:scale-95 transition-all cursor-pointer hover:bg-slate-50"
+              >
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#1c2d4a] stroke-[2.5]" />
+              </button>
+            </>
+          )}
 
           {/* Interactive Transformation Banner Box */}
           <div
@@ -237,20 +251,20 @@ const BeforeAfterSlider = () => {
                 loading="lazy"
               />
 
-              {/* Dark scrim overlay centered vertically to align with slider line */}
-              <div className="absolute inset-y-0 right-0 w-full sm:w-3/5 bg-gradient-to-l from-black/90 via-black/60 to-transparent flex items-center justify-center sm:justify-end p-3 sm:p-6 md:p-8 pointer-events-none">
-                <div key={`after-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-center sm:items-end text-center sm:text-right space-y-1 sm:space-y-2.5 transition-all duration-300">
-                  <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/50 text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
+              {/* Dark scrim overlay at RIGHT TOP (Item 2: Web style right-top with compact mobile fonts) */}
+              <div className="absolute inset-y-0 right-0 w-full sm:w-3/5 bg-gradient-to-l from-black/85 via-black/40 to-transparent flex items-start justify-end p-2.5 sm:p-6 md:p-8 pt-3 sm:pt-8 pointer-events-none">
+                <div key={`after-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-end text-right space-y-1 sm:space-y-2.5 transition-all duration-300">
+                  <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-emerald-500/35 text-emerald-300 border border-emerald-400/50 text-[9px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
                     {current.afterBadge}
                   </span>
-                  <h3 className="text-base sm:text-2xl md:text-3xl font-serif font-bold text-white leading-snug sm:leading-tight drop-shadow-md">
+                  <h3 className="text-xs sm:text-2xl md:text-3xl font-serif font-bold text-white leading-tight drop-shadow-md">
                     {current.afterTitle}
                   </h3>
-                  <p className="text-[11px] sm:text-sm text-slate-200 leading-snug sm:leading-relaxed drop-shadow-sm max-w-xs sm:max-w-none line-clamp-2 sm:line-clamp-none">
+                  <p className="text-[10px] sm:text-sm text-slate-200 leading-snug drop-shadow-sm max-w-[170px] sm:max-w-none line-clamp-2 sm:line-clamp-none">
                     {current.afterDesc}
                   </p>
                   <div className="pt-0.5">
-                    <span className="inline-block text-[10px] sm:text-[11px] font-bold text-amber-300 bg-black/40 backdrop-blur-md px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/40 shadow-sm">
+                    <span className="inline-block text-[9px] sm:text-[11px] font-bold text-amber-300 bg-black/50 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/40 shadow-sm">
                       {current.afterPill}
                     </span>
                   </div>
@@ -276,20 +290,20 @@ const BeforeAfterSlider = () => {
                   loading="lazy"
                 />
 
-                {/* Dark scrim overlay centered vertically to align with slider line */}
-                <div className="absolute inset-y-0 left-0 w-full sm:w-3/5 bg-gradient-to-r from-black/90 via-black/60 to-transparent flex items-center justify-center sm:justify-start p-3 sm:p-6 md:p-8 pointer-events-none">
-                  <div key={`before-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-center sm:items-start text-center sm:text-left space-y-1 sm:space-y-2.5 transition-all duration-300">
-                    <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-rose-500/30 text-rose-300 border border-rose-400/50 text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
+                {/* Dark scrim overlay at LEFT TOP (Item 2: Web style left-top with compact mobile fonts) */}
+                <div className="absolute inset-y-0 left-0 w-full sm:w-3/5 bg-gradient-to-r from-black/85 via-black/40 to-transparent flex items-start justify-start p-2.5 sm:p-6 md:p-8 pt-3 sm:pt-8 pointer-events-none">
+                  <div key={`before-text-${current.id}`} className="w-full sm:max-w-md flex flex-col items-start text-left space-y-1 sm:space-y-2.5 transition-all duration-300">
+                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-rose-500/35 text-rose-300 border border-rose-400/50 text-[9px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
                       {current.beforeBadge}
                     </span>
-                    <h3 className="text-base sm:text-2xl md:text-3xl font-serif font-bold text-white leading-snug sm:leading-tight drop-shadow-md">
+                    <h3 className="text-xs sm:text-2xl md:text-3xl font-serif font-bold text-white leading-tight drop-shadow-md">
                       {current.beforeTitle}
                     </h3>
-                    <p className="text-[11px] sm:text-sm text-slate-200 leading-snug sm:leading-relaxed drop-shadow-sm max-w-xs sm:max-w-none line-clamp-2 sm:line-clamp-none">
+                    <p className="text-[10px] sm:text-sm text-slate-200 leading-snug drop-shadow-sm max-w-[170px] sm:max-w-none line-clamp-2 sm:line-clamp-none">
                       {current.beforeDesc}
                     </p>
                     <div className="pt-0.5">
-                      <span className="inline-block text-[10px] sm:text-[11px] font-bold text-amber-300 bg-black/45 backdrop-blur-md px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/40 shadow-sm">
+                      <span className="inline-block text-[9px] sm:text-[11px] font-bold text-amber-300 bg-black/50 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-300/40 shadow-sm">
                         {current.beforePill}
                       </span>
                     </div>
@@ -308,17 +322,19 @@ const BeforeAfterSlider = () => {
               </div>
             </div>
 
-            {/* Product Dots / Carousel Indicator */}
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full pointer-events-none">
-              {transformationProducts.map((_, dotIdx) => (
-                <span
-                  key={dotIdx}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    dotIdx === productIdx ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
-                  }`}
-                />
-              ))}
-            </div>
+            {/* Product Dots / Carousel Indicator (Shown when 'All' category is active) */}
+            {!activeCategory && (
+              <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full pointer-events-none">
+                {transformationProducts.map((_, dotIdx) => (
+                  <span
+                    key={dotIdx}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      dotIdx === productIdx ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

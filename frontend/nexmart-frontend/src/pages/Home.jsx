@@ -373,8 +373,8 @@ const Home = () => {
           ))}
         </div>
 
-        {/* 4. Interactive Wardrobe Transformation Slider (Before vs After) */}
-        <BeforeAfterSlider />
+        {/* 4. Interactive Wardrobe Transformation Slider (Before vs After - Category Synced) */}
+        <BeforeAfterSlider activeCategory={activeCategory} />
 
         {/* 5. Category-Specific Feature Highlights (Shown only when Saree or Jewellery category is active) */}
         <FeatureHighlights category={activeCategory} />

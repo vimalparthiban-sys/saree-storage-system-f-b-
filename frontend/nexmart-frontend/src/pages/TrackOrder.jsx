@@ -18,7 +18,8 @@ import {
   ShieldCheck,
   MessageCircle,
   Copy,
-  Check
+  Check,
+  ShoppingBag
 } from 'lucide-react';
 
 const TrackOrder = () => {
@@ -27,7 +28,7 @@ const TrackOrder = () => {
   const [trackedOrder, setTrackedOrder] = useState(null);
   const [searched, setSearched] = useState(false);
   const [copiedAwb, setCopiedAwb] = useState(false);
-  const { orders } = useCart();
+  const { orders, totalItemCount, setIsCartOpen } = useCart();
   const navigate = useNavigate();
 
   // Auto-track on URL param query
@@ -92,24 +93,63 @@ const TrackOrder = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-900 pb-20 md:pb-0">
-      <Navbar />
+      {/* Desktop Navbar */}
+      <div className="hidden md:block">
+        <Navbar />
+      </div>
 
-      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 w-full space-y-8">
+      {/* Mobile Sticky Top Header with Back Arrow */}
+      <header className="md:hidden sticky top-0 z-40 bg-[#1c2d4a] text-white px-3.5 py-3 flex items-center justify-between shadow-md select-none">
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => {
+              if (window.history.length > 2) {
+                navigate(-1);
+              } else {
+                navigate('/');
+              }
+            }}
+            type="button"
+            className="p-1 -ml-1 text-white hover:bg-white/10 rounded-full transition cursor-pointer active:scale-95 shrink-0"
+            aria-label="Back"
+          >
+            <ArrowLeft className="w-5 h-5 stroke-[2.3]" />
+          </button>
+          <h1 className="text-base font-bold text-white">Track Your Order</h1>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="relative p-1.5 rounded-full text-white hover:bg-white/10 transition cursor-pointer"
+            aria-label="Cart"
+          >
+            <ShoppingBag className="w-5 h-5 stroke-[2]" />
+            {totalItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-950 font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+                {totalItemCount}
+              </span>
+            )}
+          </button>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-10 w-full space-y-4 sm:space-y-8">
         {/* Top Tracking Card (Web Brand Navy & Blue Theme) */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm text-center space-y-6">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-[#1c2d4a] text-xs font-bold border border-blue-200">
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-10 border border-slate-200 shadow-2xs text-center space-y-4 sm:space-y-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#1c2d4a] text-[10px] sm:text-xs font-bold border border-blue-200">
             <Sparkles className="w-3.5 h-3.5 text-blue-700" />
             <span>EXPRESS LOGISTICS • DELHIVERY & BLUEDART API</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-slate-900">
+          <h1 className="text-xl sm:text-4xl font-serif font-bold text-slate-900">
             Live Package & AWB Tracking
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-500 max-w-xl mx-auto leading-relaxed">
             Enter your AWB barcode code, Order ID, or mobile number to track real-time courier checkpoints.
           </p>
 
-          <form onSubmit={handleTrackSubmit} className="max-w-xl mx-auto flex flex-col sm:flex-row gap-3">
+          <form onSubmit={handleTrackSubmit} className="max-w-xl mx-auto flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <div className="relative flex-1">
               <input
                 type="text"
@@ -117,12 +157,12 @@ const TrackOrder = () => {
                 value={orderQuery}
                 onChange={(e) => setOrderQuery(e.target.value)}
                 placeholder="Enter AWB Code (e.g. AWB-DEL-982140) or Order ID"
-                className="w-full px-5 py-3.5 rounded-2xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-[#1c2d4a] focus:outline-hidden bg-slate-50 focus:bg-white transition"
+                className="w-full px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-[#1c2d4a] focus:outline-hidden bg-slate-50 focus:bg-white transition"
               />
             </div>
             <button
               type="submit"
-              className="px-8 py-3.5 rounded-2xl bg-[#1c2d4a] hover:bg-[#15233b] text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-900/15 transition cursor-pointer shrink-0"
+              className="px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#1c2d4a] hover:bg-[#15233b] text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-900/15 transition cursor-pointer shrink-0 active:scale-98"
             >
               Track Now
             </button>

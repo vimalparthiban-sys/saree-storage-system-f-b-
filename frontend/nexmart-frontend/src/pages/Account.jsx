@@ -28,7 +28,8 @@ import {
   Square,
   Lock,
   Trash2,
-  Edit2
+  Edit2,
+  PhoneCall
 } from 'lucide-react';
 
 const Account = () => {
@@ -331,16 +332,17 @@ const Account = () => {
   if (activeView === 'edit-profile') {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 select-none">
-        {/* Top Header */}
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between shadow-2xs">
+        {/* Top Header (Web Blue #1c2d4a) */}
+        <header className="bg-[#1c2d4a] text-white sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('main')}
-              className="p-1 rounded-full text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              className="p-1 -ml-1 text-white hover:bg-white/10 rounded-full transition cursor-pointer"
+              aria-label="Back"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-bold text-slate-900">Edit Profile</h1>
+            <h1 className="text-base font-bold text-white">Edit Profile</h1>
           </div>
         </header>
 
@@ -431,16 +433,17 @@ const Account = () => {
   if (activeView === 'addresses') {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 select-none">
-        {/* Top Header */}
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between shadow-2xs">
+        {/* Top Header (Web Blue #1c2d4a) */}
+        <header className="bg-[#1c2d4a] text-white sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('main')}
-              className="p-1 rounded-full text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              className="p-1 -ml-1 text-white hover:bg-white/10 rounded-full transition cursor-pointer"
+              aria-label="Back"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-bold text-slate-900">Saved Addresses</h1>
+            <h1 className="text-base font-bold text-white">Saved Addresses</h1>
           </div>
         </header>
 
@@ -787,21 +790,21 @@ const Account = () => {
   if (activeView === 'privacy') {
     return (
       <div className="min-h-screen bg-slate-100/60 text-slate-900 pb-20 select-none">
-        {/* Top Header (Clean white header with back arrow matching Image 1) */}
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between shadow-2xs">
+        {/* Top Header (Web Blue #1c2d4a) */}
+        <header className="bg-[#1c2d4a] text-white sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('main')}
-              className="p-1 -ml-1 rounded-full text-slate-800 hover:bg-slate-100 transition cursor-pointer"
+              className="p-1 -ml-1 rounded-full text-white hover:bg-white/10 transition cursor-pointer"
               aria-label="Back"
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-semibold text-slate-900">Privacy Center</h1>
+            <h1 className="text-base font-bold text-white">Privacy Center</h1>
           </div>
         </header>
 
-        {/* Menu list on white background (Matching Image 1, Grievance Redressal excluded) */}
+        {/* Menu list on white background */}
         <main className="bg-white border-b border-slate-200 divide-y divide-slate-100">
           <button
             onClick={() => setActiveView('privacy-policy')}
@@ -835,7 +838,7 @@ const Account = () => {
             type="button"
             className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer"
           >
-            <span className="text-sm font-normal text-[#2874f0]">De-activate my Account</span>
+            <span className="text-sm font-medium text-[#1c2d4a]">De-activate my Account</span>
             <ChevronRight className="w-4 h-4 text-slate-400 stroke-[1.8]" />
           </button>
 
@@ -844,7 +847,7 @@ const Account = () => {
             type="button"
             className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer"
           >
-            <span className="text-sm font-normal text-[#2874f0]">Delete my Account</span>
+            <span className="text-sm font-medium text-[#1c2d4a]">Delete my Account</span>
             <ChevronRight className="w-4 h-4 text-slate-400 stroke-[1.8]" />
           </button>
         </main>
@@ -855,13 +858,13 @@ const Account = () => {
   }
 
   // =========================================================================
-  // SUB-VIEW 5B: REQUEST YOUR DATA (Matching Flipkart Image 2)
+  // SUB-VIEW 5B: REQUEST YOUR DATA (Web Blue #1c2d4a)
   // =========================================================================
   if (activeView === 'privacy-data') {
     return (
       <div className="min-h-screen bg-white text-slate-900 pb-20 select-none">
-        {/* Blue Header matching Flipkart Image 2 */}
-        <header className="bg-[#2874f0] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
+        {/* Blue Header matching Web Blue #1c2d4a */}
+        <header className="bg-[#1c2d4a] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('privacy')}
@@ -870,7 +873,7 @@ const Account = () => {
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-medium text-white">Request Your Data</h1>
+            <h1 className="text-base font-bold text-white">Request Your Data</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -919,7 +922,7 @@ const Account = () => {
                 type="checkbox"
                 checked={dataRequestChecks.all}
                 onChange={() => {}}
-                className="mt-1 w-4 h-4 accent-[#2874f0] rounded border-slate-300"
+                className="mt-1 w-4 h-4 accent-[#1c2d4a] rounded border-slate-300"
               />
               <div className="flex-1">
                 <h3 className="text-sm font-bold text-slate-900">Request all your data</h3>
@@ -938,7 +941,7 @@ const Account = () => {
                 type="checkbox"
                 checked={dataRequestChecks.addresses}
                 onChange={() => {}}
-                className="mt-1 w-4 h-4 accent-[#2874f0] rounded border-slate-300"
+                className="mt-1 w-4 h-4 accent-[#1c2d4a] rounded border-slate-300"
               />
               <div className="flex-1">
                 <h3 className="text-sm font-bold text-slate-900">Addresses</h3>
@@ -957,7 +960,7 @@ const Account = () => {
                 type="checkbox"
                 checked={dataRequestChecks.orders}
                 onChange={() => {}}
-                className="mt-1 w-4 h-4 accent-[#2874f0] rounded border-slate-300"
+                className="mt-1 w-4 h-4 accent-[#1c2d4a] rounded border-slate-300"
               />
               <div className="flex-1">
                 <h3 className="text-sm font-bold text-slate-900">Your Orders</h3>
@@ -976,7 +979,7 @@ const Account = () => {
                 type="checkbox"
                 checked={dataRequestChecks.profile}
                 onChange={() => {}}
-                className="mt-1 w-4 h-4 accent-[#2874f0] rounded border-slate-300"
+                className="mt-1 w-4 h-4 accent-[#1c2d4a] rounded border-slate-300"
               />
               <div className="flex-1">
                 <h3 className="text-sm font-bold text-slate-900">Profile Information</h3>
@@ -997,7 +1000,7 @@ const Account = () => {
               setTimeout(() => setActiveView('privacy'), 1200);
             }}
             type="button"
-            className="w-full mt-6 py-3 rounded-xl bg-[#2874f0] hover:bg-blue-600 text-white font-bold text-sm shadow-md transition active:scale-98 cursor-pointer"
+            className="w-full mt-6 py-3 rounded-xl bg-[#1c2d4a] hover:bg-[#15233a] text-white font-bold text-sm shadow-md transition active:scale-98 cursor-pointer"
           >
             Submit Request
           </button>
@@ -1009,13 +1012,13 @@ const Account = () => {
   }
 
   // =========================================================================
-  // SUB-VIEW 5C: CONSENT MANAGEMENT (Matching Flipkart Image 3)
+  // SUB-VIEW 5C: CONSENT MANAGEMENT (Web Blue #1c2d4a)
   // =========================================================================
   if (activeView === 'privacy-consent') {
     return (
       <div className="min-h-screen bg-slate-100/60 text-slate-900 pb-20 select-none">
-        {/* Blue Header matching Flipkart Image 3 */}
-        <header className="bg-[#2874f0] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
+        {/* Blue Header matching Web Blue #1c2d4a */}
+        <header className="bg-[#1c2d4a] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('privacy')}
@@ -1024,7 +1027,7 @@ const Account = () => {
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-medium text-white">Consent Management</h1>
+            <h1 className="text-base font-bold text-white">Consent Management</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -1062,7 +1065,7 @@ const Account = () => {
                 setGeneralPolicyAccepted(nextState);
                 handleActionToast(nextState ? 'Policy accepted ✓' : 'Consent withdrawn');
               }}
-              className="text-sm font-bold text-[#2874f0] hover:underline cursor-pointer"
+              className="text-sm font-bold text-[#1c2d4a] hover:underline cursor-pointer"
             >
               {generalPolicyAccepted ? 'Accepted ✓' : 'Accept'}
             </button>
@@ -1095,13 +1098,13 @@ const Account = () => {
   }
 
   // =========================================================================
-  // SUB-VIEW 5D: PRIVACY POLICY FULL TEXT (Matching Flipkart Image 4)
+  // SUB-VIEW 5D: PRIVACY POLICY FULL TEXT (Web Blue #1c2d4a)
   // =========================================================================
   if (activeView === 'privacy-policy') {
     return (
       <div className="min-h-screen bg-white text-slate-900 pb-20 select-none">
-        {/* Blue Header matching Flipkart Image 4 */}
-        <header className="bg-[#2874f0] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
+        {/* Blue Header matching Web Blue #1c2d4a */}
+        <header className="bg-[#1c2d4a] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('privacy')}
@@ -1110,7 +1113,7 @@ const Account = () => {
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-medium text-white">Privacy Policy</h1>
+            <h1 className="text-base font-bold text-white">Privacy Policy</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -1154,11 +1157,11 @@ const Account = () => {
           </p>
 
           <p className="text-xs text-slate-600 leading-relaxed italic">
-            We value the trust you place in us and recognize the importance of secure transactions and information privacy. This Privacy Policy describes how APPZYS Retail Private Limited and its affiliates, group companies and related parties (collectively "APPZYS", "we", "our", "us") collect, use, share or otherwise process your personal data through APPZYS website <a href="https://appzys.com" className="text-[#2874f0] underline">www.appzys.com</a>, its mobile application, and m-site (hereinafter referred to as the "Platform").
+            We value the trust you place in us and recognize the importance of secure transactions and information privacy. This Privacy Policy describes how APPZYS Retail Private Limited and its affiliates, group companies and related parties (collectively "APPZYS", "we", "our", "us") collect, use, share or otherwise process your personal data through APPZYS website <a href="https://appzys.com" className="text-[#1c2d4a] font-bold underline">www.appzys.com</a>, its mobile application, and m-site (hereinafter referred to as the "Platform").
           </p>
 
           <p className="text-xs text-slate-600 leading-relaxed italic">
-            While you can browse sections of the Platform without the need of sharing any information with us, however, please note we do not offer any product or service under this Platform outside India and your personal data will primarily be stored and processed in India. By visiting this Platform, providing your information or availing our product/service, you expressly agree to be bound by the terms and conditions of this Privacy Policy, the <span onClick={() => setActiveView('privacy-terms')} className="text-[#2874f0] underline cursor-pointer">Terms of Use</span> and the applicable service/product terms and conditions.
+            While you can browse sections of the Platform without the need of sharing any information with us, however, please note we do not offer any product or service under this Platform outside India and your personal data will primarily be stored and processed in India. By visiting this Platform, providing your information or availing our product/service, you expressly agree to be bound by the terms and conditions of this Privacy Policy, the <span onClick={() => setActiveView('privacy-terms')} className="text-[#1c2d4a] font-bold underline cursor-pointer">Terms of Use</span> and the applicable service/product terms and conditions.
           </p>
 
           <h3 className="text-xs sm:text-sm font-bold text-slate-900 pt-2">
@@ -1184,12 +1187,12 @@ const Account = () => {
   }
 
   // =========================================================================
-  // SUB-VIEW 5E: TERMS OF USE FULL TEXT
+  // SUB-VIEW 5E: TERMS OF USE FULL TEXT (Web Blue #1c2d4a)
   // =========================================================================
   if (activeView === 'privacy-terms') {
     return (
       <div className="min-h-screen bg-white text-slate-900 pb-20 select-none">
-        <header className="bg-[#2874f0] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
+        <header className="bg-[#1c2d4a] text-white px-4 py-3 sticky top-0 z-30 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('privacy-consent')}
@@ -1198,7 +1201,7 @@ const Account = () => {
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-medium text-white">Terms of use</h1>
+            <h1 className="text-base font-bold text-white">Terms of use</h1>
           </div>
         </header>
 
@@ -1230,19 +1233,20 @@ const Account = () => {
   if (activeView === 'privacy-deactivate') {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 select-none">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between shadow-2xs">
+        {/* Top Header (Web Blue #1c2d4a) */}
+        <header className="bg-[#1c2d4a] text-white sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
                 setDeactivateStep('confirm');
                 setActiveView('privacy');
               }}
-              className="p-1 -ml-1 text-slate-800 hover:bg-slate-100 rounded-full transition cursor-pointer"
+              className="p-1 -ml-1 text-white hover:bg-white/10 rounded-full transition cursor-pointer"
               aria-label="Back"
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-semibold text-slate-900">De-activate my Account</h1>
+            <h1 className="text-base font-bold text-white">De-activate my Account</h1>
           </div>
         </header>
 
@@ -1366,27 +1370,27 @@ const Account = () => {
   }
 
   // =========================================================================
-  // SUB-VIEW 5G: DELETE MY ACCOUNT
+  // SUB-VIEW 5G: DELETE MY ACCOUNT (Web Blue #1c2d4a)
   // =========================================================================
   if (activeView === 'privacy-delete') {
     return (
       <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 select-none">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3.5 flex items-center justify-between shadow-2xs">
+        <header className="bg-[#1c2d4a] text-white sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveView('privacy')}
-              className="p-1 -ml-1 text-slate-800 hover:bg-slate-100 rounded-full transition cursor-pointer"
+              className="p-1 -ml-1 text-white hover:bg-white/10 rounded-full transition cursor-pointer"
               aria-label="Back"
             >
               <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
             </button>
-            <h1 className="text-base font-semibold text-slate-900">Delete my Account</h1>
+            <h1 className="text-base font-bold text-white">Delete my Account</h1>
           </div>
         </header>
 
         <main className="max-w-lg mx-auto p-4 space-y-4">
-          <div className="bg-white rounded-2xl border border-rose-200 p-5 space-y-3">
-            <h3 className="font-bold text-sm text-rose-700">Permanent Account Deletion</h3>
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-2xs">
+            <h3 className="font-bold text-sm text-slate-900">Permanent Account Deletion</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
               <strong>Warning:</strong> Deleting your account is permanent:
             </p>
@@ -1412,7 +1416,7 @@ const Account = () => {
                   }, 1200);
                 }}
                 type="button"
-                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                className="flex-1 py-2.5 rounded-xl bg-[#1c2d4a] hover:bg-[#15233a] text-white text-xs font-bold transition shadow-xs cursor-pointer"
               >
                 Permanently Delete
               </button>
@@ -1481,8 +1485,8 @@ const Account = () => {
             to="/contact"
             className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-2xs hover:shadow-md transition flex items-center gap-3 cursor-pointer group"
           >
-            <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition">
-              <Heart className="w-5 h-5 stroke-[2]" />
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1c2d4a] flex items-center justify-center shrink-0 group-hover:scale-105 transition">
+              <PhoneCall className="w-5 h-5 stroke-[2]" />
             </div>
             <div>
               <span className="text-xs sm:text-sm font-bold text-slate-900 block">Contact Us</span>

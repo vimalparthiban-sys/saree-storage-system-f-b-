@@ -32,58 +32,90 @@ const MobileBottomNav = () => {
 
   return (
     <>
-      {/* Mobile Bottom Navigation Bar: Home | Categories | Track | Account | Cart */}
+      {/* Mobile Bottom Navigation Bar: Home | Categories | Track | Account | Cart (Flipkart Style Rounded Pills & Touch Highlight) */}
       <nav 
         aria-label="Mobile Bottom Navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/98 backdrop-blur-md border-t border-slate-200 py-1 px-1.5 flex items-center justify-around shadow-2xl select-none"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/98 backdrop-blur-md border-t border-slate-200/90 py-1 px-1 flex items-center justify-around shadow-2xl select-none"
         style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
       >
         {/* 1. Home */}
         <Link
           to="/"
           onClick={() => setIsCategoryDrawerOpen(false)}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition ${
-            isHome ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
-          }`}
+          className="flex flex-col items-center justify-center flex-1 py-0.5 group select-none"
         >
-          <HomeIcon className={`w-5 h-5 ${isHome ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
-          <span className="text-[10px] mt-0.5">Home</span>
+          <div className={`px-4 py-1 rounded-full transition-all duration-200 flex items-center justify-center active:scale-90 ${
+            isHome
+              ? 'bg-[#1c2d4a]/12 text-[#1c2d4a] shadow-2xs'
+              : 'text-slate-500 hover:text-slate-800 active:bg-slate-100'
+          }`}>
+            <HomeIcon className={`w-5 h-5 ${isHome ? 'stroke-[2.5] text-[#1c2d4a]' : 'stroke-[1.9]'}`} />
+          </div>
+          <span className={`text-[10px] mt-0.5 tracking-tight transition-colors ${
+            isHome ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 font-medium'
+          }`}>
+            Home
+          </span>
         </Link>
 
         {/* 2. Categories (Flipkart 4-squares icon) */}
         <button
           onClick={() => setIsCategoryDrawerOpen(true)}
           type="button"
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition cursor-pointer ${
-            isCategoryDrawerOpen ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
-          }`}
+          className="flex flex-col items-center justify-center flex-1 py-0.5 group select-none cursor-pointer"
         >
-          <LayoutGrid className={`w-5 h-5 ${isCategoryDrawerOpen ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
-          <span className="text-[10px] mt-0.5">Categories</span>
+          <div className={`px-4 py-1 rounded-full transition-all duration-200 flex items-center justify-center active:scale-90 ${
+            isCategoryDrawerOpen
+              ? 'bg-[#1c2d4a]/12 text-[#1c2d4a] shadow-2xs'
+              : 'text-slate-500 hover:text-slate-800 active:bg-slate-100'
+          }`}>
+            <LayoutGrid className={`w-5 h-5 ${isCategoryDrawerOpen ? 'stroke-[2.5] text-[#1c2d4a]' : 'stroke-[1.9]'}`} />
+          </div>
+          <span className={`text-[10px] mt-0.5 tracking-tight transition-colors ${
+            isCategoryDrawerOpen ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 font-medium'
+          }`}>
+            Categories
+          </span>
         </button>
 
         {/* 3. Track Order */}
         <Link
           to="/track-order"
           onClick={() => setIsCategoryDrawerOpen(false)}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition ${
-            isTrack ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
-          }`}
+          className="flex flex-col items-center justify-center flex-1 py-0.5 group select-none"
         >
-          <Truck className={`w-5 h-5 ${isTrack ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
-          <span className="text-[10px] mt-0.5">Track</span>
+          <div className={`px-4 py-1 rounded-full transition-all duration-200 flex items-center justify-center active:scale-90 ${
+            isTrack
+              ? 'bg-[#1c2d4a]/12 text-[#1c2d4a] shadow-2xs'
+              : 'text-slate-500 hover:text-slate-800 active:bg-slate-100'
+          }`}>
+            <Truck className={`w-5 h-5 ${isTrack ? 'stroke-[2.5] text-[#1c2d4a]' : 'stroke-[1.9]'}`} />
+          </div>
+          <span className={`text-[10px] mt-0.5 tracking-tight transition-colors ${
+            isTrack ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 font-medium'
+          }`}>
+            Track
+          </span>
         </Link>
 
         {/* 4. Account (Flipkart User icon) */}
         <Link
           to="/account"
           onClick={() => setIsCategoryDrawerOpen(false)}
-          className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl transition ${
-            isAccount ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'
-          }`}
+          className="flex flex-col items-center justify-center flex-1 py-0.5 group select-none"
         >
-          <User className={`w-5 h-5 ${isAccount ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
-          <span className="text-[10px] mt-0.5">Account</span>
+          <div className={`px-4 py-1 rounded-full transition-all duration-200 flex items-center justify-center active:scale-90 ${
+            isAccount
+              ? 'bg-[#1c2d4a]/12 text-[#1c2d4a] shadow-2xs'
+              : 'text-slate-500 hover:text-slate-800 active:bg-slate-100'
+          }`}>
+            <User className={`w-5 h-5 ${isAccount ? 'stroke-[2.5] text-[#1c2d4a]' : 'stroke-[1.9]'}`} />
+          </div>
+          <span className={`text-[10px] mt-0.5 tracking-tight transition-colors ${
+            isAccount ? 'text-[#1c2d4a] font-bold' : 'text-slate-500 font-medium'
+          }`}>
+            Account
+          </span>
         </Link>
 
         {/* 5. Cart with Live Item Badge */}
@@ -93,17 +125,17 @@ const MobileBottomNav = () => {
             setIsCartOpen(true);
           }}
           type="button"
-          className="flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-700 hover:text-[#1c2d4a] transition cursor-pointer relative"
+          className="flex flex-col items-center justify-center flex-1 py-0.5 group select-none cursor-pointer relative"
         >
-          <div className="relative">
-            <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
+          <div className="px-4 py-1 rounded-full transition-all duration-200 flex items-center justify-center active:scale-90 text-slate-500 hover:text-[#1c2d4a] active:bg-slate-100 relative">
+            <ShoppingBag className="w-5 h-5 stroke-[1.9]" />
             {totalItemCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-amber-500 text-slate-950 font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs animate-in zoom-in">
+              <span className="absolute top-0.5 right-2 bg-amber-500 text-slate-950 font-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center shadow-xs animate-in zoom-in">
                 {totalItemCount}
               </span>
             )}
           </div>
-          <span className="text-[10px] mt-0.5 font-medium">Cart</span>
+          <span className="text-[10px] mt-0.5 tracking-tight text-slate-500 font-medium">Cart</span>
         </button>
       </nav>
 
