@@ -112,6 +112,9 @@ export const CartProvider = ({ children }) => {
     const awbNum = 'AWB-DEL-' + Math.floor(100000 + Math.random() * 900000);
     const orderId = 'ORD-2026-' + Math.floor(1000 + Math.random() * 9000);
     const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const trackingBaseUrl = typeof window !== 'undefined' && window.location.origin
+      ? window.location.origin
+      : 'https://saree-storage-system-f-b.onrender.com';
 
     const newOrder = {
       id: orderId,
@@ -134,7 +137,7 @@ export const CartProvider = ({ children }) => {
         {
           stage: 'ORDER_PLACED',
           time: nowTime,
-          message: `Namaste ${orderData.customerName || 'Customer'}! 📦 Your APPZYS order #${orderId} (Total: ₹${orderData.totalAmount}) is confirmed! We are preparing your order for express dispatch. Courier: Delhivery Express (AWB: ${awbNum}). Live tracking: https://appzys.com/track-order?awb=${awbNum}. Support: +91 98400 12345.`
+          message: `Namaste ${orderData.customerName || 'Customer'}! 📦 Your APPZYS order #${orderId} (Total: ₹${orderData.totalAmount}) is confirmed! We are preparing your order for express dispatch. Courier: Delhivery Express (AWB: ${awbNum}). Live tracking: ${trackingBaseUrl}/track-order?awb=${awbNum}. Support: +91 98400 12345.`
         }
       ]
     };
@@ -182,6 +185,9 @@ export const CartProvider = ({ children }) => {
           const updatedAwb = ord.awb || ('AWB-DEL-' + Math.floor(100000 + Math.random() * 900000));
           const existingEvents = ord.trackingEvents ? [...ord.trackingEvents] : [];
           const existingLogs = ord.whatsappLogs ? [...ord.whatsappLogs] : [];
+          const trackingBaseUrl = typeof window !== 'undefined' && window.location.origin
+            ? window.location.origin
+            : 'https://saree-storage-system-f-b.onrender.com';
 
           let newEvent = null;
           let newWhatsapp = null;
@@ -197,7 +203,7 @@ export const CartProvider = ({ children }) => {
             newWhatsapp = {
               stage: 'PACKED',
               time: nowTime,
-              message: `✅ Order #${ord.id} Packed! High-grade stainless steel frame & moisture-proof fabric verified. Dispatching to ${updatedCourier} courier partner shortly.`
+              message: `✅ Order #${ord.id} Packed & Quality Verified! Dispatching to ${updatedCourier} (AWB: ${updatedAwb}) shortly. Live tracking: ${trackingBaseUrl}/track-order?awb=${updatedAwb}. Helpline: +91 98400 12345.`
             };
           } else if (newStatus === 'SHIPPED') {
             newEvent = {
@@ -210,7 +216,7 @@ export const CartProvider = ({ children }) => {
             newWhatsapp = {
               stage: 'DISPATCHED',
               time: nowTime,
-              message: `🚀 Dispatched! Your package is in transit via ${updatedCourier} (AWB: ${updatedAwb}). Live tracking: https://appzys.com/track-order?awb=${updatedAwb}. Expected delivery in 1-2 business days!`
+              message: `🚀 Dispatched! Your package is in transit via ${updatedCourier} (AWB: ${updatedAwb}). Live tracking: ${trackingBaseUrl}/track-order?awb=${updatedAwb}. Expected delivery in 1-2 business days!`
             };
           } else if (newStatus === 'OUT_FOR_DELIVERY') {
             newEvent = {
@@ -223,7 +229,7 @@ export const CartProvider = ({ children }) => {
             newWhatsapp = {
               stage: 'OUT_FOR_DELIVERY',
               time: nowTime,
-              message: `🚚 Out for Delivery! Rider will deliver your APPZYS package today. Please keep your phone available for delivery verification.`
+              message: `🚚 Out for Delivery! Rider from ${updatedCourier} will deliver your APPZYS package #${ord.id} today. Track live: ${trackingBaseUrl}/track-order?awb=${updatedAwb}. Please keep your phone available.`
             };
           } else if (newStatus === 'DELIVERED') {
             newEvent = {
@@ -236,7 +242,7 @@ export const CartProvider = ({ children }) => {
             newWhatsapp = {
               stage: 'DELIVERED',
               time: nowTime,
-              message: `🎉 Delivered! Thank you for ordering from APPZYS Smart Storage. Enjoy your organized wardrobe! Please reach out to our WhatsApp support (+91 98400 12345) for any setup assistance.`
+              message: `🎉 Delivered! Order #${ord.id} has been delivered safely to your doorstep. Thank you for choosing APPZYS Smart Storage! View details: ${trackingBaseUrl}/track-order?awb=${updatedAwb}. WhatsApp support: +91 98400 12345.`
             };
           } else if (newStatus === 'DELAYED') {
             newEvent = {
@@ -250,7 +256,7 @@ export const CartProvider = ({ children }) => {
             newWhatsapp = {
               stage: 'TRANSIT_ALERT',
               time: nowTime,
-              message: `⚠️ Transit Update: Your package has encountered a short regional route delay. Our APPZYS dedicated support team is actively tracking it with ${updatedCourier}. Replacement guarantee is active. WhatsApp Support: +91 98400 12345.`
+              message: `⚠️ Transit Update: Your package has encountered a short regional route delay. Our APPZYS dedicated support team is actively tracking it with ${updatedCourier}. Live tracking: ${trackingBaseUrl}/track-order?awb=${updatedAwb}. Replacement guarantee is active. WhatsApp Support: +91 98400 12345.`
             };
           }
 

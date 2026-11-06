@@ -22,6 +22,23 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    try {
+      const existing = localStorage.getItem('appzys_contact_messages');
+      const messages = existing ? JSON.parse(existing) : [];
+      const newMsg = {
+        id: 'MSG-' + Math.floor(1000 + Math.random() * 9000),
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || '9840012345',
+        message: formData.message,
+        createdAt: new Date().toISOString(),
+        status: 'NEW'
+      };
+      localStorage.setItem('appzys_contact_messages', JSON.stringify([newMsg, ...messages]));
+      window.dispatchEvent(new Event('storage'));
+    } catch (err) {
+      console.error(err);
+    }
     setSubmitted(true);
   };
 
