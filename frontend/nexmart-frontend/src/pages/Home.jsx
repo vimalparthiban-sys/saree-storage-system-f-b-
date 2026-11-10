@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { products } from '../data/products';
+import { getLiveProducts, getLiveBanners } from '../services/productManager';
 import AnnouncementBar from '../components/AnnouncementBar';
 import Navbar from '../components/Navbar';
 import TrustAssuranceBar from '../components/TrustAssuranceBar';
@@ -107,6 +107,36 @@ const ProductCardImage = ({ product }) => {
 };
 
 const Home = () => {
+  const [productsList, setProductsList] = useState(getLiveProducts());
+  const [bannersList, setBannersList] = useState(getLiveBanners());
+  const [currentBannerIdx, setCurrentBannerIdx] = useState(0);
+
+  useEffect(() => {
+    const handleProductsChange = () => setProductsList(getLiveProducts());
+    const handleBannersChange = () => setBannersList(getLiveBanners());
+    window.addEventListener('appzys_products_changed', handleProductsChange);
+    window.addEventListener('appzys_banners_changed', handleBannersChange);
+    window.addEventListener('storage', handleProductsChange);
+    return () => {
+      window.removeEventListener('appzys_products_changed', handleProductsChange);
+      window.removeEventListener('appzys_banners_changed', handleBannersChange);
+      window.removeEventListener('storage', handleProductsChange);
+    };
+  }, []);
+
+  const activeBanners = (bannersList || []).filter((b) => b.active !== false);
+  const currentBanner = activeBanners[currentBannerIdx] || activeBanners[0] || {
+    imageUrl: '/images/appzys-hero-banner.jpg',
+    title: 'APPZYS Smart Storage Solutions'
+  };
+
+  useEffect(() => {
+    if (activeBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentBannerIdx((prev) => (prev + 1) % activeBanners.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeBanners.length]);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchQuery = searchParams.get('search') || '';
@@ -114,23 +144,24 @@ const Home = () => {
   const [sortBy, setSortBy] = useState('featured');
 
   // Filter products
-  let filteredProducts = products.filter((p) => {
+  let filteredProducts = (productsList || []).filter((p) => {
+    if (!p) return false;
     const matchesCategory = !activeCategory || p.categorySlug === activeCategory;
     const matchesSearch = !searchQuery || 
-                          p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          p.shortTitle.toLowerCase().includes(searchQuery.toLowerCase());
+                          (p.title && p.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                          (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                          (p.shortTitle && p.shortTitle.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStock = !inStockOnly || p.inStock;
     return matchesCategory && matchesSearch && matchesStock;
   });
 
   // Sort products
   if (sortBy === 'price-low') {
-    filteredProducts.sort((a, b) => a.basePrice - b.basePrice);
+    filteredProducts.sort((a, b) => (a.basePrice || 0) - (b.basePrice || 0));
   } else if (sortBy === 'price-high') {
-    filteredProducts.sort((a, b) => b.basePrice - a.basePrice);
+    filteredProducts.sort((a, b) => (b.basePrice || 0) - (a.basePrice || 0));
   } else if (sortBy === 'title-az') {
-    filteredProducts.sort((a, b) => a.shortTitle.localeCompare(b.shortTitle));
+    filteredProducts.sort((a, b) => (a.shortTitle || a.title || '').localeCompare(b.shortTitle || b.title || ''));
   }
 
   return (
@@ -142,8 +173,8 @@ const Home = () => {
       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-1 w-full">
         <div className="relative group overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-md">
           <img
-            src="/images/appzys-hero-banner.jpg"
-            alt="APPZYS Smart Storage Solutions - Saree & Jewellery Organisers"
+            src={currentBanner.imageUrl || '/images/appzys-hero-banner.jpg'}
+            alt={currentBanner.title || 'APPZYS Smart Storage Solutions'}
             className="w-full h-auto object-cover block select-none"
             loading="eager"
             fetchPriority="high"
@@ -153,17 +184,17 @@ const Home = () => {
           <div className="absolute inset-0 pointer-events-none">
             {/* 1. "Shop Saree Organiser" CTA Button */}
             <Link
-              to="/?category=saree-organiser"
+              to={currentBanner.btn1Link || '/?category=saree-organiser'}
               className="pointer-events-auto absolute left-[3.5%] top-[48%] w-[14.5%] h-[8%] rounded-full cursor-pointer hover:opacity-80 transition"
-              title="Shop Saree Organiser (60L)"
-              aria-label="Shop Saree Organiser"
+              title={currentBanner.btn1Text || 'Shop Saree Organiser (60L)'}
+              aria-label={currentBanner.btn1Text || 'Shop Saree Organiser'}
             />
             {/* 2. "Shop Jewellery Organiser" CTA Button */}
             <Link
-              to="/?category=jewel-organiser"
+              to={currentBanner.btn2Link || '/?category=jewel-organiser'}
               className="pointer-events-auto absolute left-[18.5%] top-[48%] w-[15.5%] h-[8%] rounded-full cursor-pointer hover:opacity-80 transition"
-              title="Shop Jewellery Organiser (Velvet)"
-              aria-label="Shop Jewellery Organiser"
+              title={currentBanner.btn2Text || 'Shop Jewellery Organiser (Velvet)'}
+              aria-label={currentBanner.btn2Text || 'Shop Jewellery Organiser'}
             />
             {/* 3. Saree Organiser Box */}
             <Link
@@ -202,7 +233,7 @@ const Home = () => {
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            ✨ All ({products.length})
+            ✨ All ({productsList.length})
           </button>
           <button
             onClick={() => {

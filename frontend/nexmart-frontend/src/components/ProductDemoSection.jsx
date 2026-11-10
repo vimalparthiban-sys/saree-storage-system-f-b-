@@ -10,7 +10,18 @@ const ProductDemoSection = ({ product }) => {
   const { demo, comparison } = product;
   const isJewel = product?.id === 'jewellery-organiser' || product?.categorySlug === 'jewel-organiser';
 
+  const isImageMedia = (url) => {
+    if (!url) return false;
+    return (
+      url.startsWith('data:image/') ||
+      /\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(url)
+    );
+  };
+
   const getVideoSrc = (step) => {
+    const customStep = product?.demo?.steps?.[step - 1] || product?.setupGuide?.steps?.[step - 1];
+    if (customStep && customStep.video) return customStep.video;
+
     if (isJewel) {
       return step === 1
         ? '/videos/jewel_step1.mp4'
@@ -58,11 +69,17 @@ const ProductDemoSection = ({ product }) => {
     };
   }, [isVideoModalOpen]);
 
+  const isDemoEnabled = (product?.demo?.enabled !== false) && (product?.setupGuide?.enabled !== false);
+  const isComparisonEnabled = (product?.comparison?.enabled !== false);
+
+  if (!isDemoEnabled && !isComparisonEnabled) return null;
+
   return (
     <div className="space-y-16">
-      
       {/* 1. Dedicated 3-Step Demo for this Product */}
-      <section className="py-6 sm:py-12 bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-10 shadow-xs">
+      {isDemoEnabled && (
+        <>
+          <section className="py-6 sm:py-12 bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-10 shadow-xs">
         <div className="text-center max-w-3xl mx-auto space-y-2.5 mb-6 sm:mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#1c2d4a] text-xs font-bold border border-blue-200 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-[#1c2d4a]" />
@@ -183,17 +200,32 @@ const ProductDemoSection = ({ product }) => {
             title="Click to view full screen video"
           >
             
-            {/* The Real Video Clip corresponding to the active step */}
-            <video
-              key={`${product?.id}-${activeStep}`}
-              src={getVideoSrc(activeStep)}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-cover rounded-xl shadow-2xl transition duration-300 group-hover:scale-[1.02]"
-            />
+            {/* The Real Video / Photo Clip corresponding to the active step (5-second auto loop) */}
+            {isImageMedia(getVideoSrc(activeStep)) ? (
+              <img
+                key={`${product?.id}-${activeStep}`}
+                src={getVideoSrc(activeStep)}
+                alt={product?.demo?.steps?.[activeStep - 1]?.title || 'Step Demo'}
+                className="w-full h-full object-cover rounded-xl shadow-2xl transition duration-300 group-hover:scale-[1.02]"
+              />
+            ) : (
+              <video
+                key={`${product?.id}-${activeStep}`}
+                src={getVideoSrc(activeStep)}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                onTimeUpdate={(e) => {
+                  if (e.target.currentTime >= 5) {
+                    e.target.currentTime = 0;
+                    e.target.play();
+                  }
+                }}
+                className="w-full h-full object-cover rounded-xl shadow-2xl transition duration-300 group-hover:scale-[1.02]"
+              />
+            )}
 
             {/* Dynamic Step Header Badge */}
             <div className="absolute top-4 left-4 bg-slate-900/85 text-white border border-sky-400/40 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 animate-in fade-in">
@@ -289,15 +321,24 @@ const ProductDemoSection = ({ product }) => {
             className="w-full h-full flex items-center justify-center p-4 sm:p-12 max-w-5xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <video
-              key={`fullscreen-${product?.id}-${activeStep}`}
-              src={getVideoSrc(activeStep)}
-              autoPlay
-              loop
-              controls
-              playsInline
-              className="max-w-[92vw] max-h-[78vh] sm:max-h-[82vh] w-auto h-auto rounded-2xl shadow-2xl border border-white/10 object-contain bg-black"
-            />
+            {isImageMedia(getVideoSrc(activeStep)) ? (
+              <img
+                key={`fullscreen-${product?.id}-${activeStep}`}
+                src={getVideoSrc(activeStep)}
+                alt={product?.demo?.steps?.[activeStep - 1]?.title || 'Step Demo'}
+                className="max-w-[92vw] max-h-[78vh] sm:max-h-[82vh] w-auto h-auto rounded-2xl shadow-2xl border border-white/10 object-contain bg-black"
+              />
+            ) : (
+              <video
+                key={`fullscreen-${product?.id}-${activeStep}`}
+                src={getVideoSrc(activeStep)}
+                autoPlay
+                loop
+                controls
+                playsInline
+                className="max-w-[92vw] max-h-[78vh] sm:max-h-[82vh] w-auto h-auto rounded-2xl shadow-2xl border border-white/10 object-contain bg-black"
+              />
+            )}
           </div>
 
           {/* Forward / Next Step Arrow Button */}
@@ -334,9 +375,11 @@ const ProductDemoSection = ({ product }) => {
           </div>
         </div>
       )}
+        </>
+      )}
 
       {/* 2. Dedicated Comparison for this Product */}
-      {comparison && (
+      {isComparisonEnabled && comparison && (
         <section className="py-6">
           <div className="text-center max-w-3xl mx-auto space-y-2 mb-8">
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">

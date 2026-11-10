@@ -1,8 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getLiveSliders } from '../services/productManager';
 
-const transformationProducts = [
+const defaultTransformationProducts = [
   {
     id: 'saree',
     badge: 'WARDROBE TRANSFORMATION',
@@ -42,6 +43,7 @@ const transformationProducts = [
 ];
 
 const BeforeAfterSlider = ({ activeCategory }) => {
+  const [slidersList, setSlidersList] = useState(getLiveSliders());
   const [productIdx, setProductIdx] = useState(0);
   const [sliderPos, setSliderPos] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -53,18 +55,32 @@ const BeforeAfterSlider = ({ activeCategory }) => {
   const containerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
+  useEffect(() => {
+    const handleUpdate = () => setSlidersList(getLiveSliders());
+    window.addEventListener('appzys_sliders_changed', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('appzys_sliders_changed', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
+  const currentSliders = slidersList && slidersList.length > 0 ? slidersList : defaultTransformationProducts;
+
   // Sync category selection: saree organiser = product 0, jewellery organiser = product 1 (Item 6)
   useEffect(() => {
     if (activeCategory === 'saree-organiser') {
-      setProductIdx(0);
+      const sIdx = currentSliders.findIndex((s) => s.id === 'saree' || s.shopLink?.includes('saree'));
+      setProductIdx(sIdx > -1 ? sIdx : 0);
       setSliderPos(50);
     } else if (activeCategory === 'jewel-organiser') {
-      setProductIdx(1);
+      const jIdx = currentSliders.findIndex((s) => s.id === 'jewellery' || s.shopLink?.includes('jewel'));
+      setProductIdx(jIdx > -1 ? jIdx : 1);
       setSliderPos(50);
     }
-  }, [activeCategory]);
+  }, [activeCategory, currentSliders]);
 
-  const current = transformationProducts[productIdx];
+  const current = currentSliders[productIdx] || currentSliders[0];
 
   // Pause automatic movement when user actively touches, drags, or clicks
   const pauseAutoPlay = useCallback(() => {
@@ -94,16 +110,16 @@ const BeforeAfterSlider = ({ activeCategory }) => {
 
   // 2. Automatic Movement Action: Cycles products only when 'All' category is active
   useEffect(() => {
-    // If not visible on screen, or if user is touching/sliding, or if category is filtered, pause automatic action
     if (!isVisible || isUserInteracting || isDragging || activeCategory) return;
+    if (currentSliders.length <= 1) return;
 
     const interval = setInterval(() => {
-      setProductIdx((prev) => (prev + 1) % transformationProducts.length);
+      setProductIdx((prev) => (prev + 1) % currentSliders.length);
       setSliderPos(50); // Reset slider to center for fresh comparison
     }, 4500); // 4.5 seconds cycle
 
     return () => clearInterval(interval);
-  }, [isVisible, isUserInteracting, isDragging, activeCategory]);
+  }, [isVisible, isUserInteracting, isDragging, activeCategory, currentSliders.length]);
 
   const updateContainerWidth = useCallback(() => {
     if (containerRef.current) {
@@ -121,7 +137,7 @@ const BeforeAfterSlider = ({ activeCategory }) => {
     e.preventDefault();
     e.stopPropagation();
     pauseAutoPlay();
-    setProductIdx((prev) => (prev === 0 ? transformationProducts.length - 1 : prev - 1));
+    setProductIdx((prev) => (prev === 0 ? currentSliders.length - 1 : prev - 1));
     setSliderPos(50);
   };
 
@@ -129,7 +145,7 @@ const BeforeAfterSlider = ({ activeCategory }) => {
     e.preventDefault();
     e.stopPropagation();
     pauseAutoPlay();
-    setProductIdx((prev) => (prev === transformationProducts.length - 1 ? 0 : prev + 1));
+    setProductIdx((prev) => (prev === currentSliders.length - 1 ? 0 : prev + 1));
     setSliderPos(50);
   };
 

@@ -29,6 +29,9 @@ public class Product {
     @Column(length = 2000)
     private String description;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String dataJson;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductPack> packs = new ArrayList<>();
 
@@ -92,6 +95,9 @@ public class Product {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getDataJson() { return dataJson; }
+    public void setDataJson(String dataJson) { this.dataJson = dataJson; }
 
     public List<ProductPack> getPacks() { return packs; }
     public void setPacks(List<ProductPack> packs) { this.packs = packs; }

@@ -54,6 +54,19 @@ export const api = {
     return request(`/products/${id}`);
   },
 
+  saveProduct: async (productData) => {
+    return request('/products', {
+      method: 'POST',
+      body: JSON.stringify(productData),
+    });
+  },
+
+  deleteProduct: async (id) => {
+    return request(`/products/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   trackProductView: async (trackData) => {
     return request('/products/track-view', {
       method: 'POST',

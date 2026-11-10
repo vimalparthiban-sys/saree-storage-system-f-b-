@@ -24,6 +24,7 @@ const Navbar = () => {
   const { user, isAdmin, openAuth, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
   const [searchParams] = useSearchParams();
 
   // Search input state
@@ -144,26 +145,30 @@ const Navbar = () => {
             ======================================================== */}
             <div className="h-[54px] flex items-center justify-between gap-4">
               
-              {/* Search Bar */}
-              <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative flex items-center">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchValue}
-                  onChange={handleSearchChange}
-                  placeholder="What are you searching for?"
-                  className="w-full h-[38px] pl-10 pr-9 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#1c2d4a] focus:outline-hidden text-xs text-slate-800 transition placeholder:text-slate-400 shadow-2xs"
-                />
-                {searchValue && (
-                  <button
-                    type="button"
-                    onClick={handleClearSearch}
-                    className="absolute right-3 text-slate-400 hover:text-slate-700 text-xs cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </form>
+              {/* Search Bar: Hidden on /admin page */}
+              {!isAdminPage ? (
+                <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative flex items-center">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchValue}
+                    onChange={handleSearchChange}
+                    placeholder="What are you searching for?"
+                    className="w-full h-[38px] pl-10 pr-9 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#1c2d4a] focus:outline-hidden text-xs text-slate-800 transition placeholder:text-slate-400 shadow-2xs"
+                  />
+                  {searchValue && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="absolute right-3 text-slate-400 hover:text-slate-700 text-xs cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </form>
+              ) : (
+                <div className="flex-1" />
+              )}
 
               {/* Action Buttons (Hover highlights only) */}
               <div className="flex items-center gap-1.5 shrink-0">
@@ -424,26 +429,28 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Search Row */}
-        <form onSubmit={handleSearchSubmit} className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
-          <input
-            type="text"
-            value={searchValue}
-            onChange={handleSearchChange}
-            placeholder="What are you searching for?"
-            className="w-full pl-8 pr-7 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1c2d4a]"
-          />
-          {searchValue && (
-            <button
-              type="button"
-              onClick={handleClearSearch}
-              className="absolute right-2.5 top-2.5 text-slate-400 text-xs"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </form>
+        {/* Mobile Search Row: Hidden on /admin */}
+        {!isAdminPage && (
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+            <input
+              type="text"
+              value={searchValue}
+              onChange={handleSearchChange}
+              placeholder="What are you searching for?"
+              className="w-full pl-8 pr-7 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#1c2d4a]"
+            />
+            {searchValue && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-2.5 top-2.5 text-slate-400 text-xs"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </form>
+        )}
       </div>
 
     </header>

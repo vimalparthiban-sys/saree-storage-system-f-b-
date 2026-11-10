@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Home as HomeIcon, LayoutGrid, User, ShoppingBag, X, ChevronRight, Layers, Sparkles, Truck } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
+import { getLiveProducts } from '../services/productManager';
 
 const MobileBottomNav = () => {
+  const [productsList, setProductsList] = useState(getLiveProducts());
+
+  useEffect(() => {
+    const update = () => setProductsList(getLiveProducts());
+    window.addEventListener('appzys_products_changed', update);
+    return () => window.removeEventListener('appzys_products_changed', update);
+  }, []);
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -183,7 +190,7 @@ const MobileBottomNav = () => {
 
               {/* Products inside this category with direct photos & price */}
               <div className="space-y-2.5">
-                {products.map((p) => (
+                {productsList.map((p) => (
                   <div
                     key={p.id}
                     onClick={() => handleSelectProduct(p.id)}

@@ -33,6 +33,25 @@ public class ProductController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping
+    public ApiResponse<Product> createOrUpdateProduct(@RequestBody Product product) {
+        if (product.getId() == null || product.getId().isBlank()) {
+            String slug = (product.getTitle() != null ? product.getTitle() : "product")
+                    .toLowerCase()
+                    .replaceAll("[^a-z0-9]+", "-")
+                    .replaceAll("^-|-$", "");
+            product.setId(slug + "-" + System.currentTimeMillis() % 10000);
+        }
+        Product saved = productService.saveProduct(product);
+        return ApiResponse.success("Product saved successfully", saved);
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteProduct(@PathVariable String id) {
+        productService.deleteProduct(id);
+        return ApiResponse.success("Product deleted successfully", id);
+    }
+
     /**
      * Endpoint triggered when a customer views a product or adds it to cart.
      * Automatically registers a single scheduled reminder (5 minutes) with product photo.

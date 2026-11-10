@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { products } from '../data/products';
+import { getLiveProductById, getLiveProducts } from '../services/productManager';
 import { getProductReviews } from '../data/reviewsData';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -52,21 +52,42 @@ const ProductDetail = () => {
   const { user } = useAuth();
   const [mobileSearch, setMobileSearch] = useState('');
 
-  const product = products.find((p) => p.id === id) || products[0];
-  const isProductInCart = Boolean(cart && cart.some((item) => item.id === product.id));
-
+  const [product, setProduct] = useState(() => getLiveProductById(id) || getLiveProducts()[0] || {});
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedPackIndex, setSelectedPackIndex] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
-  const [selectedColor, setSelectedColor] = useState(product.colors[0].name);
+  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'Standard');
+  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || '');
   const [quantity, setQuantity] = useState(1);
 
+  const isProductInCart = Boolean(cart && product?.id && cart.some((item) => item.id === product.id));
+
+  useEffect(() => {
+    const current = getLiveProductById(id) || getLiveProducts()[0] || {};
+    setProduct(current);
+    if (current?.colors?.length > 0) {
+      setSelectedColor(current.colors[0].name);
+    }
+    if (current?.sizes?.length > 0) {
+      setSelectedSize(current.sizes[0]);
+    }
+    setSelectedImageIndex(0);
+  }, [id]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      const current = getLiveProductById(id) || getLiveProducts()[0] || {};
+      setProduct(current);
+    };
+    window.addEventListener('appzys_products_changed', handleUpdate);
+    return () => window.removeEventListener('appzys_products_changed', handleUpdate);
+  }, [id]);
+
   // Active color images (switches gallery dynamically when a color is clicked!)
-  const activeColorObj = product.colors?.find((c) => c.name === selectedColor);
+  const activeColorObj = product?.colors?.find((c) => c.name === selectedColor);
   const currentImages = (activeColorObj && activeColorObj.images && activeColorObj.images.length > 0)
     ? activeColorObj.images
-    : product.images;
+    : (product?.images || ['/placeholder.jpg']);
 
   // 5 reviews per page pagination state (Google style)
   const [currentPage, setCurrentPage] = useState(1);
@@ -793,11 +814,11 @@ const ProductDetail = () => {
           </div>
 
           <div className="space-y-4 text-slate-700 text-xs sm:text-sm leading-relaxed">
-            <p>{product.description}</p>
+            <p className="whitespace-pre-line text-slate-700 leading-relaxed">{product.description || 'Spacious, durable and stylish storage organiser designed for modern living.'}</p>
             
             <h3 className="font-bold text-slate-900 text-xs sm:text-sm pt-2">Key Highlights:</h3>
             <ul className="space-y-2">
-              {product.keyFeatures.map((f, i) => (
+              {(product.keyFeatures || product.perfectFor || []).map((f, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span>{f}</span>
